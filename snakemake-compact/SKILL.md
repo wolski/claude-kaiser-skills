@@ -144,6 +144,33 @@ rule final:
         final=protected("results/{sample}.final")  # Read-only
 ```
 
+## Utility Rules (help & clean)
+```python
+# Help rule - list available targets
+rule help:
+    """Show available workflow targets."""
+    run:
+        print("Available targets:")
+        print("  all        - Run complete workflow")
+        print("  clean      - Remove generated files")
+        print("  help       - Show this help")
+        print("")
+        print("Usage: snakemake <target> -j 1")
+
+localrules: help
+
+# Clean rule - remove generated files
+rule clean:
+    """Remove all generated files."""
+    shell:
+        """
+        rm -rf results/ logs/ bench/
+        echo "Cleaned generated files"
+        """
+
+localrules: clean
+```
+
 ## CLI
 ```bash
 snakemake -n -j 1               # Dry-run
