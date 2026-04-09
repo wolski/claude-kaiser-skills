@@ -1,6 +1,12 @@
 ---
 name: mixed-r-python-pipeline
-description: Expert guidance for turning existing Snakemake analysis projects (with Snakefile + src/) into pip-installable CLI tools that can deploy the workflow to new projects. Use when the user has a working analysis project with Snakemake and R/Python scripts and wants to make it reusable/deployable. Creates CLI with init, validate, update, clean, info commands. Reference implementation at /Users/wolski/projects/ptm-pipeline.
+description: >
+  This skill should be used when the user asks to "create a CLI tool from a Snakemake
+  project", "make a pipeline deployable", "wrap a workflow as a pip package", "turn an
+  analysis into a reusable tool", or "package a Snakemake workflow". Also use when the
+  user has a working Snakemake + R/Python analysis project and wants to make it
+  pip-installable with init, validate, update, clean, and info commands — even if they
+  do not explicitly mention CLI packaging.
 ---
 
 # Turn Existing Snakemake Projects into Deployable CLI Tools
@@ -9,7 +15,7 @@ Take an existing analysis project with a working Snakefile and src/ directory an
 
 ## Starting Point
 
-You already have a working project:
+Assume a working project with this structure:
 ```
 my-analysis-project/
 ├── Snakefile              ← Already exists and works
@@ -24,7 +30,7 @@ my-analysis-project/
 
 ## Goal
 
-Create a CLI tool that can deploy this workflow to new projects:
+The CLI tool deploys the workflow to new projects:
 ```bash
 my-pipeline init /path/to/new/project
 # → Discovers data, generates config, copies Snakefile + src/
@@ -32,7 +38,7 @@ my-pipeline init /path/to/new/project
 
 ## Reference Implementation
 
-**ptm-pipeline**: `/Users/wolski/projects/ptm-pipeline`
+**ptm-pipeline** (if available at `/Users/wolski/projects/ptm-pipeline`):
 
 Key files to study:
 - `src/ptm_pipeline/cli.py` - Click commands
@@ -55,7 +61,7 @@ mkdir -p src/my_pipeline template
 ### Step 2: Move Existing Workflow to template/
 
 ```bash
-# From your existing working project:
+# From the existing working project:
 cp Snakefile ../my-pipeline/template/
 cp helpers.py ../my-pipeline/template/
 cp -r src/ ../my-pipeline/template/src/
@@ -126,7 +132,7 @@ def find_folders(directory: Path, patterns: List[str]) -> Dict[str, List[Path]]:
             results[key] = matches
     return results
 
-# Define patterns for YOUR data types:
+# Define patterns for the project's data types:
 DATA_PATTERNS = ["DEA_*", "results_*", "input_*"]
 ```
 
@@ -159,7 +165,7 @@ my-pipeline/                          # The CLI tool
 │   ├── config.py
 │   ├── validate.py
 │   └── clean.py
-└── template/                         # Your original workflow
+└── template/                         # The original workflow
     ├── Snakefile
     ├── helpers.py
     └── src/

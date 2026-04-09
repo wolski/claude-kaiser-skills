@@ -1,6 +1,11 @@
 ---
 name: python-style-guide-compact
-description: Compact Python style guide. Key conventions for clean, typed, documented code.
+description: >
+  This skill should be used when the user asks to "write Python code", "check Python
+  style", or "format Python" and a lightweight style reference is sufficient. Provides
+  condensed Python conventions for imports, types, naming, docstrings, and preferred
+  libraries. For comprehensive guidance with advanced type patterns, modern Python
+  features, and antipatterns, defer to the python-style-guide skill instead.
 ---
 
 # Python Style Essentials

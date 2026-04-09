@@ -1,16 +1,23 @@
 ---
 name: python-style-guide
-description: Comprehensive Python programming guidelines based on Google's Python Style Guide. Use when Claude needs to write Python code, review Python code for style issues, refactor Python code, or provide Python programming guidance. Covers language rules (imports, exceptions, type annotations), style rules (naming conventions, formatting, docstrings), and best practices for clean, maintainable Python code.
-license: Complete terms in LICENSE.txt
+description: >
+  This skill should be used when the user asks to "write Python code", "review Python
+  style", "refactor Python code", "add type annotations", "write a docstring", or
+  "check Python conventions". Also use when working with .py files, discussing Python
+  imports, naming, formatting, or type hints — even if not explicitly requesting style
+  guidance. Covers language rules (imports, exceptions, type annotations), style rules
+  (naming, formatting, docstrings), modern Python features, and best practices based on
+  Google's Python Style Guide. For a lightweight reference, defer to the
+  python-style-guide-compact skill instead.
 ---
 
 # Python Style Guide
 
-Comprehensive guidelines for writing clean, maintainable Python code based on [Google's Python Style Guide](https://google.github.io/styleguide/pyguide.html).
+Follow these guidelines when writing or reviewing Python code, based on [Google's Python Style Guide](https://google.github.io/styleguide/pyguide.html).
 
 ## Core Philosophy
 
-**BE CONSISTENT.** Match the style of the code around you. Use these guidelines as defaults, but always prioritize consistency with existing code.
+Match the style of surrounding code. Consistency within a file or module matters more than strict adherence to these guidelines.
 
 ## Language Rules
 
@@ -74,7 +81,7 @@ except:  # Too broad, hides bugs
 
 ### Type Annotations
 
-Annotate all function signatures. Type annotations improve code readability and catch errors early.
+Annotate all function signatures. Type annotations improve readability and catch errors early.
 
 **General rules:**
 - Annotate all public APIs
@@ -94,19 +101,47 @@ def process_items(items: list[str]) -> None:
 
 ### Default Argument Values
 
-Never use mutable objects as default values in function definitions.
+Never use mutable objects as default values. Use one of these two approaches:
 
-**Yes:**
+**1. Simple types with defaults** — for few, independent parameters:
 ```python
-def foo(a: int, b: list[int] | None = None) -> None:
-    if b is None:
-        b = []
+def fetch_data(url: str, timeout: int = 30, retries: int = 3) -> dict:
+    ...
 ```
+
+**2. Pydantic models** — for grouped parameters or config objects:
+```python
+from pydantic import BaseModel
+
+class ProcessConfig(BaseModel):
+    timeout: int = 30
+    retries: int = 3
+
+def process(items: list[str], config: ProcessConfig) -> int:
+    """Process items with config."""
+    return len(items)
+
+# Caller uses ProcessConfig() for defaults
+process(items, ProcessConfig())
+```
+
+Benefits of Pydantic models:
+- Function signatures are honest (expects config, gets config)
+- Defaults live in one place (the model)
+- Caller intent is explicit (`Config()` means "I want defaults")
+- No `None` checks cluttering function bodies
+- Built-in validation
 
 **No:**
 ```python
-def foo(a: int, b: list[int] = []) -> None:  # Mutable default - WRONG!
+# Mutable default - WRONG!
+def foo(a: int, b: list[int] = []) -> None:
     b.append(a)
+
+# None pattern - AVOID!
+def foo(a: int, b: list[int] | None = None) -> None:
+    if b is None:
+        b = []
 ```
 
 ### True/False Evaluations
@@ -596,7 +631,7 @@ When writing Python code:
 8. Always use context managers for resources
 9. Run `ruff check` and `ruff format`
 10. Keep `__init__.py` files empty
-11. **BE CONSISTENT** with existing code
+11. **Stay consistent** with existing code
 
 ## Additional Resources
 
