@@ -1,5 +1,5 @@
 ---
-name: r-development-agent
+name: r-development
 description: >
   R package development agent. Use when asked to fix, add, refactor,
   or modify code in an R package that has a Makefile.
