@@ -7,8 +7,7 @@ description: >
   imports, naming, formatting, or type hints — even if not explicitly requesting style
   guidance. Covers language rules (imports, exceptions, type annotations), style rules
   (naming, formatting, docstrings), modern Python features, and best practices based on
-  Google's Python Style Guide. For a lightweight reference, defer to the
-  python-style-guide-compact skill instead.
+  Google's Python Style Guide.
 ---
 
 # Python Style Guide

@@ -21,7 +21,6 @@ All skills should follow the guidelines in `skill-creator/` and `skill-developme
 Skills reviewed against skill-creator/skill-development guidelines (2026-04-08):
 - `r-development` — full rewrite: description, namespacing, new sections, scope boundary with r-package-development
 - `python-style-guide` — description, writing style, removed ALL CAPS
-- `python-style-guide-compact` — description, scope boundary with full version
 - `mixed-r-python-pipeline` — description, removed second-person, framed local paths
 
 Skills sourced from official upstream repos:
