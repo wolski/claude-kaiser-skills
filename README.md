@@ -60,6 +60,7 @@ end
 | `general-agentic` | Defensive coding philosophy for agents | No |
 | `phosphoproteomics-ptm-analysis` | Phosphoproteomics workflows | No |
 | `prolfqua-adding-models` | Adding models to prolfqua | No |
+| `prolfquapp-dea` | Running prolfquapp DEA CLI workflows | No |
 | `bfabricpy` | B-Fabric LIMS Python client | No |
 | `bookdown` | Bookdown/R Markdown publishing | No |
 | `school-study-materials` | Study material generation | No |

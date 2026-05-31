@@ -58,11 +58,45 @@ Rules:
 ## Step 3: Implement The Contrast Adapter
 Every new backend should have a `Contrasts*` adapter inheriting `ContrastsInterface`.
 
-Required methods:
+Required methods to implement (the bare ones; everything else has a default):
 - `get_contrast_sides()`
 - `get_contrasts()`
 - `get_Plotter()`
 - `to_wide()`
+
+The interface ships **default implementations** of the following that read the
+backend's `ContrastConfiguration`, so most backends do not need to override:
+
+- `filter_significant(FDR_threshold, diff_threshold)` — symmetric on
+  `cfg$effect_col`, or one-sided when
+  `cfg$significance_directional = TRUE`.
+- `get_ora(up, FDR_threshold, diff_threshold)` — directional filter on
+  `cfg$effect_col` and `cfg$fdr_col`.
+- `get_rank(score = NULL)` — defaults to
+  `sign(effect) * -log10(p.value)` when `cfg$has_pvalue()`, else
+  `cfg$effect_col`.
+- `contrast_summary_table(rounded = TRUE)` — canonical-named summary
+  (`contrast`, `effect`, `score`, `fdr`) for downstream report grobs.
+- `extra_artifacts()` — returns an empty list; override if the backend
+  needs to surface extra tables in reports (e.g. SAINT input tables).
+
+Override only when the backend's logic genuinely differs — for example,
+`ContrastsSAINTexpress` overrides `get_rank` because it has no p-value.
+
+### `ContrastConfiguration` — column-role mapping
+
+`prolfqua::ContrastConfiguration` (see `R/ContrastConfiguration.R`)
+mirrors `AnalysisConfiguration` for the modelling side: it names the
+columns the backend uses for `contrast`, `effect`, `score`, `pvalue`,
+`fdr`, `avg_abundance`, plus behaviour flags
+(`supports_dea_qc`, `needs_saint_annotation`,
+`significance_directional`). Subclasses set
+`self$config <- ContrastConfiguration$new(...)` in `initialize()`.
+Consumers of contrast results read columns via the config
+(e.g. `cfg$effect_col`) instead of hard-coding column names. This is
+the mechanism that lets backends like SAINTexpress (`BFDR`,
+`log2_EFCs`, `SaintScore`) be reached by the same downstream report
+code that drives LM-style backends (`FDR`, `diff`, `statistic`).
 
 `get_contrasts()` should return this standard schema:
 - `modelName` (column name in output data frame, not R6 field)
@@ -78,10 +112,22 @@ Required methods:
 - `conf.high`
 - `sigma`
 
+A backend whose native columns deliberately diverge from this schema
+(e.g. SAINTexpress emits `Bait` / `log2_EFCs` / `SaintScore` / `BFDR`)
+should:
+
+1. keep its native columns in `get_contrasts()` so the XLSX sheets
+   stay backwards-compatible, AND
+2. set a SAINT-flavoured `ContrastConfiguration` so the inherited
+   defaults (`filter_significant`, `get_ora`, `get_rank`,
+   `contrast_summary_table`) resolve the right columns automatically.
+
 Rules:
-- Translate backend-specific names inside the adapter.
+- Translate backend-specific names inside the adapter where it makes
+  sense; otherwise use the config so downstream code stays generic.
 - Keep downstream code unaware of backend-specific output conventions.
-- Reuse `pivot_model_contrasts_to_wide()` for `to_wide()` unless a backend truly requires something else.
+- Reuse `pivot_model_contrasts_to_wide()` for `to_wide()` unless a
+  backend truly requires something else.
 - Validate the final output against `ContrastsInterface$column_description()`.
 
 ## Step 4: Only Then Decide How To Fit The Model
@@ -141,11 +187,16 @@ If those assumptions fail, do not force the backend into `Contrasts`. Write a de
 If the backend should be part of the user-facing API, add a facade in `R/ContrastsFacades.R`.
 
 Facade responsibilities:
-1. validate the shape of `LFQData`
-2. prepend the response column to the formula
-3. fit the model
-4. build the contrast object
-5. return standardized output with a `facade` column
+1. inherit from `ContrastsInterface` so the default
+   `filter_significant`, `get_ora`, `get_rank`,
+   `contrast_summary_table`, `extra_artifacts` methods are available
+2. validate the shape of `LFQData`
+3. prepend the response column to the formula
+4. fit the model
+5. build the contrast object
+6. set `self$config <- self$contrast$get_config()` so the facade
+   exposes the same `ContrastConfiguration` as the wrapped adapter
+7. return standardized output with a `facade` column
 
 Follow existing names like:
 - `ContrastsLMFacade`
@@ -153,6 +204,38 @@ Follow existing names like:
 - `ContrastsLimmaFacade`
 
 The facade is the final integration point. If the facade feels awkward, the underlying adapter design is usually still wrong.
+
+### Registering a facade
+
+`prolfqua::FACADE_REGISTRY` is the named index of built-in facades.
+For a facade that lives **inside** `prolfqua`, add a `.builtin_facade_entry`
+call in `R/ContrastsFacades.R`.
+
+For a facade that lives in a **downstream package** (e.g.
+`prolfquasaint::ContrastsSAINTFacade`), register it from the
+downstream package's `.onLoad()`:
+
+```r
+# R/zzz.R in the downstream package
+.onLoad <- function(libname, pkgname) {
+  if (requireNamespace("prolfqua", quietly = TRUE) &&
+      exists("register_facade", where = asNamespace("prolfqua"))) {
+    prolfqua::register_facade(
+      "saint",
+      class = "ContrastsSAINTFacade",
+      needs = "aggregated",
+      package = "prolfquasaint",
+      needs_saint_annotation = TRUE
+    )
+  }
+  invisible()
+}
+```
+
+Once registered, `prolfqua::lookup_facade("saint")` resolves the
+class, and downstream callers (e.g. `prolfquapp::DEAnalyse$build_facade("saint")`)
+can reach the facade without `prolfqua` having to know about it at
+compile time.
 
 ## Naming conventions
 
@@ -210,9 +293,16 @@ When the backend is ready:
 
 ## Review Checklist
 - [ ] `ModelInterface` is fully implemented
-- [ ] `ContrastsInterface` is fully implemented
-- [ ] facade API is coherent and easy to call
-- [ ] backend-specific columns are normalized inside adapters
+- [ ] `ContrastsInterface` is fully implemented (or inherits, with
+      defaults driven by `ContrastConfiguration`)
+- [ ] `ContrastConfiguration` is populated in the adapter's
+      `initialize()` and accurately names the backend's columns + flags
+- [ ] facade inherits from `ContrastsInterface` and sets
+      `self$config <- self$contrast$get_config()`
+- [ ] facade is registered (built-in via `.builtin_facade_entry` or
+      downstream via `register_facade()` in `.onLoad`)
+- [ ] backend-specific columns either match the standard schema or are
+      resolved generically through `cfg$*_col` accessors
 - [ ] contrast construction is stable
 - [ ] tests cover missingness, rank deficiency, and multi-factor designs
 - [ ] `make document` was run after roxygen edits
