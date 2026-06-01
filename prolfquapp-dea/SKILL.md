@@ -1,6 +1,6 @@
 ---
 name: prolfquapp-dea
-description: Run, set up, or troubleshoot the prolfquapp differential expression analysis CLI, especially prolfqua_dea.sh, prolfqua_dataset.sh, prolfqua_yaml.sh, prolfqua_contrasts.sh, prolfqua_qc.sh, and the prolfquapp R functions that copy or drive those scripts. Use when users ask how to get prolfqua_dea.sh into a working directory, prepare the annotation/YAML inputs, choose the software key, run DEA for DIA-NN, MaxQuant, FragPipe, Spectronaut/BGS, MSstats, MZMine, or debug missing scripts/config/report outputs.
+description: Run, set up, or troubleshoot the prolfquapp differential expression analysis CLI, especially prolfqua_dea.sh, prolfqua_dataset.sh, prolfqua_yaml.sh, prolfqua_contrasts.sh, prolfqua_qc.sh, dataset annotation design, CONTROL/ContrastName/Contrast columns, paired designs with subject/bioreplicate blocking, two-factor/factorial contrasts, and the prolfquapp R functions that copy or drive those scripts. Use when users ask how to get prolfqua_dea.sh into a working directory, prepare the annotation/YAML inputs, define contrasts, choose the software key, run DEA for DIA-NN, MaxQuant, FragPipe, Spectronaut/BGS, MSstats, MZMine, or debug missing scripts/config/report outputs.
 ---
 # Prolfquapp DEA CLI
 
@@ -46,7 +46,8 @@ Generate an annotation template from the quantification output:
 ./prolfqua_dataset.sh -i data_dir/ -s DIANN -d annotation.xlsx
 ```
 
-Fill in the annotation before DEA. Typical columns include:
+Fill in the annotation before DEA. Without a design and at least one contrast definition, DEA cannot run. Typical
+columns include:
 
 - file identifier such as `Relative.Path`, `Path`, `raw.file`, or `channel`
 - `name`
@@ -68,6 +69,102 @@ Optionally add contrast definitions:
 ./prolfqua_contrasts.sh annotation.xlsx --control WT -o annotation_with_control.xlsx
 ./prolfqua_contrasts.sh annotation.xlsx --f1 treatment --f2 time -o annotation_with_contrasts.xlsx
 ```
+
+## Dataset Design And Contrasts
+
+`prolfquapp::read_annotation()` detects columns by name pattern, not by exact spelling:
+
+- file: starts with `channel`, `Relative`, `raw`, `file`, or `run`
+- sample label: starts with `name`
+- main group: starts with `group`, `bait`, or `Experiment`
+- pairing/blocking: starts with `subject` or `BioReplicate`
+- contrast definition: `ContrastName`, `Contrast`, or a column starting with `control`
+
+The main group values are sanitized by removing whitespace and replacing `-+/*()` with `_`. Keep levels simple:
+`WT`, `KO`, `T0`, `T150`, `MI_T0`, etc. The default model prefix is `G_`; contrast expressions must reference model
+levels as `G_<level>`, for example `G_KO - G_WT`.
+
+### Single-Factor Designs
+
+For an unpaired one-factor design, use one grouping column and a `CONTROL` column. The CLI helper adds this for all
+non-control levels:
+
+```bash
+./prolfqua_contrasts.sh annotation.xlsx --control WT -o annotation_with_control.xlsx
+```
+
+Example:
+
+```text
+file,name,group,CONTROL
+s1.raw,WT_1,WT,C
+s2.raw,WT_2,WT,C
+s3.raw,KO_1,KO,T
+s4.raw,OE_1,OE,T
+```
+
+This yields contrasts like `KO_vs_WT = G_KO - G_WT` and `OE_vs_WT = G_OE - G_WT`. If the group column is not named
+`group`/`experiment`, pass it explicitly:
+
+```bash
+./prolfqua_contrasts.sh annotation.xlsx --control WT --group treatment -o annotation_with_control.xlsx
+```
+
+### Paired Or Blocked Designs
+
+For paired analysis, keep the same group/CONTROL setup and add exactly one subject column named like `subject` or
+`bioreplicate`. Each subject should have observations in the relevant groups. `read_annotation()` then adds the subject
+factor and the model blocks on subject.
+
+```text
+file,name,group,subject,CONTROL
+s1.raw,S01_WT,WT,S01,C
+s2.raw,S01_KO,KO,S01,T
+s3.raw,S02_WT,WT,S02,C
+s4.raw,S02_KO,KO,S02,T
+```
+
+For unpaired designs, delete the `subject`/`bioreplicate` column instead of filling it with dummy values.
+
+### Two-Factor / Factorial Designs
+
+For a two-factor design, start with two factor columns and run:
+
+```bash
+./prolfqua_contrasts.sh annotation.xlsx --f1 treatment --f2 time -o annotation_with_contrasts.xlsx
+```
+
+The helper creates a united `Group` column plus `ContrastName` and `Contrast` columns. For `treatment = MI/MINOCA` and
+`time = T0/T150`, the generated model levels are `G_MI_T0`, `G_MI_T150`, `G_MINOCA_T0`, and `G_MINOCA_T150`.
+
+Typical generated rows look like:
+
+```text
+ContrastName,Contrast
+MINOCA_vs_MI,( (G_MINOCA_T0 + G_MINOCA_T150)/2 - (G_MI_T0 + G_MI_T150)/2 )
+MINOCA_vs_MI_at_T0,G_MINOCA_T0 - G_MI_T0
+MINOCA_vs_MI_at_T150,G_MINOCA_T150 - G_MI_T150
+interaction_MINOCA_vs_MI_at_T150_vs_T0,(G_MINOCA_T150 - G_MI_T150) - (G_MINOCA_T0 - G_MI_T0)
+```
+
+Use `--interactions FALSE` when only main-effect and level-specific contrasts are wanted:
+
+```bash
+./prolfqua_contrasts.sh annotation.xlsx --f1 treatment --f2 time --interactions FALSE -o annotation_with_contrasts.xlsx
+```
+
+### Manual Contrast Columns
+
+If `ContrastName` and `Contrast` are present, prolfquapp uses those rows and does not derive contrasts from `CONTROL`.
+Only rows with non-empty `Contrast` matter; remaining sample rows can be blank. This is the right route for custom
+factorial comparisons.
+
+Rules:
+
+- `ContrastName` is the output/report name.
+- `Contrast` is an R expression over `G_`-prefixed model levels.
+- Every referenced level must exist in the annotation's main group column after sanitization.
+- If a level name contains syntax-sensitive characters, fix the upstream group level; do not patch generated wrappers.
 
 ## Run DEA
 
