@@ -1,7 +1,8 @@
 ---
 name: prolfquapp-dea
-description: Run, set up, or troubleshoot the prolfquapp differential expression analysis CLI, especially prolfqua_dea.sh, prolfqua_dataset.sh, prolfqua_yaml.sh, prolfqua_contrasts.sh, prolfqua_qc.sh, dataset annotation design, CONTROL/ContrastName/Contrast columns, paired designs with subject/bioreplicate blocking, two-factor/factorial contrasts, and the prolfquapp R functions that copy or drive those scripts. Use when users ask how to get prolfqua_dea.sh into a working directory, prepare the annotation/YAML inputs, define contrasts, choose the software key, run DEA for DIA-NN, MaxQuant, FragPipe, Spectronaut/BGS, MSstats, MZMine, or debug missing scripts/config/report outputs.
+description: Run, set up, or troubleshoot the prolfquapp differential expression analysis CLI. This is a script-first skill: use the prolfqua_*.sh wrappers, especially prolfqua_dataset.sh, prolfqua_yaml.sh, prolfqua_contrasts.sh, prolfqua_qc.sh, and prolfqua_dea.sh, for dataset/YAML/contrast/DEA work unless the user explicitly forbids script execution. Use when preparing annotation/YAML inputs, defining CONTROL/ContrastName/Contrast columns, paired designs with subject/bioreplicate blocking, two-factor/factorial contrasts, choosing the software key, running DEA for DIA-NN, MaxQuant, FragPipe, Spectronaut/BGS, MSstats, MZMine, or debugging missing scripts/config/report outputs.
 ---
+
 # Prolfquapp DEA CLI
 
 Use this skill for `prolfquapp` command-line differential expression analysis workflows.
@@ -10,6 +11,22 @@ The source of truth is the package `README.md`. In the `prolfqua_fml` ecosystem 
 `prolfquapp/README.md` before giving detailed workflow advice. For code-level debugging, also inspect
 `prolfquapp/inst/application/bin/prolfqua_dea.sh`, `prolfquapp/inst/application/CMD_DEA_V2.R`, and
 `prolfquapp/R/copy_helpers.R`.
+
+## Script-First Rule
+
+Always drive prolfquapp setup through the shipped `prolfqua_*.sh` wrappers when they are available. Do not hand-author
+the base annotation, YAML, or supported contrast scaffolds from scratch.
+
+- First ensure the wrappers exist in the working directory, copying them with `prolfquapp::copy_shell_script()` if
+  needed.
+- Generate the base annotation with `./prolfqua_dataset.sh` from the quantification output directory and the exact
+  installed software key.
+- Generate YAML with `./prolfqua_yaml.sh`.
+- Generate supported one-factor or two-factor contrast scaffolds with `./prolfqua_contrasts.sh`.
+- Only after a script-generated annotation exists, make minimal manual edits for information the wrappers cannot infer
+  or express, such as custom factorial contrasts or project-specific blocking columns.
+- If a wrapper is missing or fails, fix wrapper availability, package installation, or the input data. Do not bypass the
+  failing wrapper by creating a replacement CSV manually unless the user explicitly asks for that fallback.
 
 ## Core Workflow
 
@@ -47,8 +64,8 @@ Generate an annotation template from the quantification output:
 ./prolfqua_dataset.sh -i data_dir/ -s prolfquapp.DIANN -d annotation.xlsx
 ```
 
-Fill in the annotation before DEA. Without a design and at least one contrast definition, DEA cannot run. Typical
-columns include:
+Use this script-generated annotation as the starting point. Fill in the annotation before DEA. Without a design and at
+least one contrast definition, DEA cannot run. Typical columns include:
 
 - file identifier such as `Relative.Path`, `Path`, `raw.file`, or `channel`
 - `name`
@@ -64,7 +81,7 @@ Create the YAML config:
 
 Edit the generated YAML for analysis parameters not exposed on the command line.
 
-Optionally add contrast definitions:
+Add contrast definitions with the helper whenever the requested design is supported:
 
 ```bash
 ./prolfqua_contrasts.sh annotation.xlsx --control WT -o annotation_with_control.xlsx
@@ -129,14 +146,23 @@ For unpaired designs, delete the `subject`/`bioreplicate` column instead of fill
 
 ### Two-Factor / Factorial Designs
 
-For a two-factor design, start with two factor columns and run:
+For a two-factor design, start from a `prolfqua_dataset.sh`-generated annotation, add the two factor columns to that
+annotation, and run the contrast helper with interactions enabled:
 
 ```bash
-./prolfqua_contrasts.sh annotation.xlsx --f1 treatment --f2 time -o annotation_with_contrasts.xlsx
+./prolfqua_contrasts.sh annotation.xlsx --f1 treatment --f2 time --interactions TRUE -o annotation_with_contrasts.xlsx
 ```
 
-The helper creates a united `Group` column plus `ContrastName` and `Contrast` columns. For `treatment = MI/MINOCA` and
-`time = T0/T150`, the generated model levels are `G_MI_T0`, `G_MI_T150`, `G_MINOCA_T0`, and `G_MINOCA_T150`.
+For standard two-factor factorial analyses, use this helper output directly. Do not filter, replace, or hand-write the
+generated contrasts unless the user explicitly asks for a reduced/custom contrast set. The helper creates a united
+`Group` column plus `ContrastName` and `Contrast` columns. With interactions enabled, the output includes:
+
+- the averaged main effect for `--f1`
+- the simple effects of `--f1` at each level of `--f2`
+- the interaction contrast
+
+For `treatment = MI/MINOCA` and `time = T0/T150`, the generated model levels are `G_MI_T0`, `G_MI_T150`,
+`G_MINOCA_T0`, and `G_MINOCA_T150`.
 
 Typical generated rows look like:
 
@@ -154,11 +180,20 @@ Use `--interactions FALSE` when only main-effect and level-specific contrasts ar
 ./prolfqua_contrasts.sh annotation.xlsx --f1 treatment --f2 time --interactions FALSE -o annotation_with_contrasts.xlsx
 ```
 
+When the user asks for both conditional directions, run the helper twice and use both outputs directly. For example,
+for "Ixa given Disulfiram" and "Disulfiram given Ixa":
+
+```bash
+./prolfqua_contrasts.sh annotation.csv --f1 Ixa --f2 Disulfiram --interactions TRUE -o dataset_Ixa_given_Disulfiram.csv
+./prolfqua_contrasts.sh annotation.csv --f1 Disulfiram --f2 Ixa --interactions TRUE -o dataset_Disulfiram_given_Ixa.csv
+```
+
 ### Manual Contrast Columns
 
 If `ContrastName` and `Contrast` are present, prolfquapp uses those rows and does not derive contrasts from `CONTROL`.
-Only rows with non-empty `Contrast` matter; remaining sample rows can be blank. This is the right route for custom
-factorial comparisons.
+Only rows with non-empty `Contrast` matter; remaining sample rows can be blank. Manual contrast columns are only for
+comparisons that `prolfqua_contrasts.sh` cannot generate. For standard single-factor or two-factor factorial designs,
+use the wrapper output as-is instead of manually constructing, filtering, or replacing contrasts.
 
 Rules:
 
@@ -166,6 +201,8 @@ Rules:
 - `Contrast` is an R expression over `G_`-prefixed model levels.
 - Every referenced level must exist in the annotation's main group column after sanitization.
 - If a level name contains syntax-sensitive characters, fix the upstream group level; do not patch generated wrappers.
+- Keep manual edits minimal and auditable: add or adjust only the design columns and contrast rows needed for the
+  requested comparison.
 
 ## Run DEA
 
