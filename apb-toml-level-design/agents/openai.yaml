@@ -1,0 +1,4 @@
+interface:
+  display_name: "APB TOML Level Design"
+  short_description: "Create and review APB parsing-rule TOMLs from vendor files."
+  default_prompt: "Use APB TOML Level Design to review whether this parsing rule captures vendor output without manufacturing derived quantitative levels."
