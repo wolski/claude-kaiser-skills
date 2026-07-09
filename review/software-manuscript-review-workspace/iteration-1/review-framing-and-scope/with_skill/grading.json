@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Separates what goes to the authors, to the editor, and what is kept private",
+      "passed": true,
+      "evidence": "Section 3 explicitly splits To the authors / To the editor / Keep private."
+    },
+    {
+      "text": "Frames reuse/attribution/validation of established methods as the governing thesis for an integrated-platform paper (not a bug hunt)",
+      "passed": true,
+      "evidence": "Section 1 states reuse/attribution/validation + reproducibility is the governing thesis for an integrated platform, not a bug hunt."
+    },
+    {
+      "text": "Preserves confidentiality: warns against opening GitHub issues / contacting authors via the repo, and flags the journal AI-in-review policy",
+      "passed": true,
+      "evidence": "Section 6 warns 'Do NOT open GitHub issues', preserve anonymity, and check the journal AI-use policy (Section 0)."
+    },
+    {
+      "text": "Applies the 'reviewer is not the authors' QA' framing (bugs as evidence for the thesis, not a debugging service)",
+      "passed": true,
+      "evidence": "Section 1/2 state the install failure etc. are reproducibility evidence and 'not something you should resolve by debugging their scripts'."
+    },
+    {
+      "text": "Handles COI correctly: names the class of DEA tools and does not cite the reviewer's own package in the submittable text",
+      "passed": false,
+      "evidence": "Flagged the COI up front and named the class, BUT the drafted review_for_authors.txt lists 'prolfqua' inside the DEA class in the SUBMITTED text (prolfqua count=1) - the reviewer's own package should not be cited in the submitted review at all."
+    },
+    {
+      "text": "Recommends a concise, thesis-first, human-voiced review (~750 words) rather than a five-page audit",
+      "passed": true,
+      "evidence": "Recommends thesis-first, ~750-word review; its own drafted review is 759 words."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 1,
+    "total": 6,
+    "pass_rate": 0.833
+  }
+}

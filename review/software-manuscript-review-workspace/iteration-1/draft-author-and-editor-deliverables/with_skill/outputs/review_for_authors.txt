@@ -1,0 +1,86 @@
+Review of "OmniProt" (first-round review)
+
+OmniProt addresses a real and common need: taking outputs from the three most
+widely used proteomics quantification tools (MaxQuant, FragPipe, and DIA-NN)
+through a single downstream workflow - QC, normalization, imputation,
+differential expression, and functional enrichment - in one accessible web
+environment. Bringing these steps together behind one interface, and releasing
+the underlying code openly, is a worthwhile goal and the right instinct for a
+community tool. My concerns are not with the ambition but with whether the
+current submission supports its central claims of transparency,
+reproducibility, and methodological soundness. As it stands, several of those
+claims cannot be verified from the submitted materials, and I recommend major
+revision. My main concerns follow.
+
+Major concerns
+
+1. The released code is not a reproducible, installable package, and the
+manuscript analyses cannot be reproduced.
+The paper presents "OmniProtR" as an open-source package released "for full
+transparency and reproducibility," but the repository is a collection of R
+scripts rather than an R package: it has no DESCRIPTION or NAMESPACE, it does
+not install (R CMD INSTALL fails), it contains no tests, and several functions
+carry hard-coded local paths (e.g. /home/dev/...). No example data are provided
+for any module, and Figures 1-2 cite only a PRIDE accession with no processing
+details (search settings, filtering, parameters, or the mapping from raw files
+to the analyzed tables). An independent user therefore cannot install the code,
+run any module, or regenerate any figure, and the web analyses cannot be
+replayed. Please release OmniProtR as an installable package with the standard
+metadata, remove machine-specific paths, add a test suite covering the core
+analytical functions, provide a small runnable example dataset for each module,
+and include a scripted recipe (inputs, parameters, commands) that reproduces the
+manuscript figures from the cited accession. Source availability on its own does
+not establish reproducibility.
+
+2. Established methods are re-implemented in-house and under-attributed, without
+validation.
+VSN, KNN imputation, Bayesian PCA, the enrichment hypergeometric test, and the
+differential-expression model are each re-implemented within OmniProt and cited
+only to the platform itself, not to the methods they reproduce. Integrating
+these analyses is a legitimate contribution, but re-coding established methods
+carries two obligations that are not met here. First, attribution: please cite
+the primary methods and their reference implementations - variance-stabilizing
+normalization (Huber et al., 2002; vsn), quantile normalization (Bolstad et al.,
+2003; preprocessCore), KNN imputation (Troyanskaya et al., 2001; impute),
+Bayesian PCA (Oba et al., 2003; pcaMethods), over-representation via a
+hypergeometric test (e.g. as implemented in clusterProfiler), and the
+established, community-validated proteomics differential-expression frameworks
+(e.g. limma, MSstats, msqrob2, DEqMS). Second, validation: where a method is
+re-implemented rather than reused, please justify why the reference tool was not
+used and show the implementation is correct by benchmarking it against that
+reference. Because the code is currently neither installable nor tested (see
+concern 1), the correctness of these re-implementations cannot be checked at
+all - which is the central problem, not a matter of a few citations.
+
+3. The default enrichment background inflates significance and is not stated.
+The enrichment test appears to use the whole gene-set library as the background
+rather than the quantified proteome, and the manuscript does not state which
+background is used. Testing against the full library overstates significance,
+because proteins that were never quantifiable in the experiment should not be
+part of the reference set. Please use, and clearly document, the quantified
+proteome as the default background, and report the multiple-testing correction.
+
+4. The central biological validation is not independently checkable.
+Case Study 1's claim that OmniProt "recovers known biology" rests on a
+comparison to the same group's earlier dataset, which is not available. As
+presented this is circular and cannot be verified by a reader. Please validate
+against an independent, publicly available benchmark dataset, or make the
+comparison dataset and its full processing available.
+
+Minor concerns
+
+- The abstract and methods repeatedly use promotional terms ("easy-to-use",
+"comprehensive", "seamless"). These are not supported by the submitted evidence
+and read as value claims rather than description. Please replace them with
+specific, verifiable statements about the supported inputs, the tested
+workflows, and the current limitations.
+
+Overall
+
+The integration goal is sound and worth pursuing, but the submission does not
+yet support its transparency, reproducibility, or methodological claims. I
+recommend major revision, with re-review once the software is installable and
+tested, example data and a figure-regeneration recipe are provided, the
+re-implemented methods are attributed and validated against their reference
+implementations, the enrichment background is corrected and documented, and the
+biological validation rests on an independent dataset.

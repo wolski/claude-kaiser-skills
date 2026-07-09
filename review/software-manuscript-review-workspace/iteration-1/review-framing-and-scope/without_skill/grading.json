@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Separates what goes to the authors, to the editor, and what is kept private",
+      "passed": true,
+      "evidence": "Sections 4/5/6 separate authors / editor / keep-private thoroughly."
+    },
+    {
+      "text": "Frames reuse/attribution/validation of established methods as the governing thesis for an integrated-platform paper (not a bug hunt)",
+      "passed": false,
+      "evidence": "Lists concerns with reproducibility as M1 and attribution as M3; does not frame reuse/attribution/validation as the governing thesis for an integrated platform."
+    },
+    {
+      "text": "Preserves confidentiality: warns against opening GitHub issues / contacting authors via the repo, and flags the journal AI-in-review policy",
+      "passed": true,
+      "evidence": "Section 6 says 'Do NOT open GitHub issues' and covers the AI-assistance policy."
+    },
+    {
+      "text": "Applies the 'reviewer is not the authors' QA' framing (bugs as evidence for the thesis, not a debugging service)",
+      "passed": false,
+      "evidence": "No 'reviewer is not the authors' QA' framing; treats findings as concerns to raise, not evidence-for-a-thesis."
+    },
+    {
+      "text": "Handles COI correctly: names the class of DEA tools and does not cite the reviewer's own package in the submittable text",
+      "passed": false,
+      "evidence": "Suggests benchmarking against 'limma, MSstats, DEqMS, proDA' and lists prolfqua among existing tools; no COI awareness."
+    },
+    {
+      "text": "Recommends a concise, thesis-first, human-voiced review (~750 words) rather than a five-page audit",
+      "passed": false,
+      "evidence": "Very long multi-section guidance doc; no conciseness/word-target guidance."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 4,
+    "total": 6,
+    "pass_rate": 0.333
+  }
+}

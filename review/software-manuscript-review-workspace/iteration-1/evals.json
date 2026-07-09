@@ -1,0 +1,19 @@
+{
+  "skill_name": "software-manuscript-review",
+  "evals": [
+    {
+      "id": 0,
+      "name": "review-framing-and-scope",
+      "prompt": "I'm peer-reviewing a proteomics tool manuscript for a journal (first round). It presents 'OmniProt', an integrated web platform. Relevant excerpts: (Abstract) 'OmniProt is an easy-to-use, comprehensive platform that takes MaxQuant, FragPipe and DIA-NN outputs through QC, normalization, imputation, differential expression, and functional enrichment in a single seamless environment.' (Methods) 'Data transformation options include log2, quantile normalization and variance-stabilizing normalization (VSN). Missing values are imputed by KNN or Bayesian PCA. Differential expression uses a moderated t-test. Enrichment is computed against Gene Ontology and KEGG.' (Availability) 'The analysis code is released as the open-source OmniProtR package at github.com/example/OmniProtR for full transparency and reproducibility.' I cloned OmniProtR: it's a folder of R scripts with no DESCRIPTION/NAMESPACE, R CMD INSTALL fails, there are no tests or example data, and several functions call hard-coded /home/dev/... paths. No citations are given for VSN, KNN, Bayesian PCA, the enrichment test, or any reference differential-expression tool. What are the main concerns I should raise, and how should I frame this review? What goes to the authors vs the editor, and what should I keep private?",
+      "expected_output": "A concise reviewer plan that makes reproducibility + reimplementation-without-attribution the thesis; names the reference tools by class (not the reviewer's own); treats the bugs/QA as evidence not a service; flags promotional language and missing example data; and separates private evaluation from the author-facing review + confidential editor note.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "draft-author-and-editor-deliverables",
+      "prompt": "I've finished verifying a proteomics tool manuscript ('OmniProt', first round). Verified findings: (1) the 'open-source OmniProtR package' is a folder of scripts - no DESCRIPTION/NAMESPACE, R CMD INSTALL fails, no tests, hard-coded dev paths, a web analysis cannot be replayed (reproducibility); (2) VSN, KNN imputation, Bayesian PCA, the enrichment hypergeometric test, and the DEA model are all reimplemented in-house and cited only to the platform itself, not to the reference method tools (attribution); (3) the default enrichment background is the whole gene-set library, not the quantified proteome, which inflates significance, and the manuscript doesn't state which is used; (4) the abstract and methods use 'easy-to-use', 'comprehensive', 'seamless' repeatedly; (5) no example data for any module, and Figures 1-2 cite only a PRIDE accession with no processing details; (6) Case Study 1's 'recovers known biology' rests on a comparison to the same group's earlier, unavailable dataset. Draft my review: the comments to the authors and the confidential note to the editor. Recommendation is major revision.",
+      "expected_output": "Two concise plain-text deliverables: an author-facing review (~750 words, Major/Minor, human voice, opens with genuine strengths, no internal process detail) and a short confidential editor note with the recommendation and rationale. Attribution named by class, not the reviewer's own tool.",
+      "files": []
+    }
+  ]
+}

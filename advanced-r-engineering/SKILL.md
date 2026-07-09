@@ -76,6 +76,12 @@ Keep APIs boring, because predictability is what makes them safe to depend on:
 - consistent parameter names across related functions;
 - predictable handling of `NA`, empty inputs, and zero-row data frames.
 
+For report, vignette, or workflow-specific requests, first change the call site
+using existing package APIs. Treat new exported arguments, NEWS entries, Rd
+topics, roxygen changes, or public helpers as package API changes; make those
+only when the user explicitly asks for a package-level feature or the existing
+API cannot express the requested behavior.
+
 ## Testing Checklist
 
 For behavior changes, ask whether tests cover:

@@ -1,0 +1,107 @@
+Review of "OmniProt" (first round)
+
+Summary
+-------
+OmniProt is presented as an integrated platform for proteomics data analysis,
+distributed as an open-source R package (OmniProtR) together with a web
+interface, and covering a full workflow: normalization (VSN), missing-value
+imputation (KNN and Bayesian PCA), differential expression analysis, and
+functional enrichment (hypergeometric test). Bringing these steps together
+behind a single, accessible interface addresses a real need in the field, and
+the two case studies show the intended end-to-end use.
+
+That said, several substantial issues need to be resolved before the manuscript
+can be considered further. They concern (1) the availability and
+reproducibility of the software that is the paper's central contribution,
+(2) attribution of the underlying methods, (3) the statistical validity of the
+enrichment analysis, (4) the strength of the biological validation, and
+(5) the absence of example data and reproducible figures. My specific comments
+follow, ordered roughly by importance.
+
+Major points
+------------
+
+1. Software availability and reproducibility.
+The manuscript describes OmniProtR as an open-source R package, but in its
+current state it is a folder of scripts rather than an installable package:
+there is no DESCRIPTION or NAMESPACE file, `R CMD INSTALL` fails, there is no
+test suite, and several scripts contain hard-coded, developer-specific file
+paths. In addition, I was not able to replay the web-based analysis. For a
+software/tool paper the artifact is the primary contribution, so this needs to
+be brought to a state where a reader can install and run it. Please:
+   a. Package OmniProtR as a proper installable R package with DESCRIPTION and
+      NAMESPACE, and confirm it passes `R CMD check` (ideally `R CMD check
+      --as-cran`).
+   b. Remove all hard-coded local paths; take inputs and output locations as
+      arguments/parameters.
+   c. Add a test suite (e.g., testthat) covering the core functions of each
+      module.
+   d. Make the web analysis reproducible, e.g., by exposing the exact inputs,
+      parameter settings, and software versions used, and by providing a
+      scripted path that reproduces the same result.
+   e. Deposit a versioned, citable release (e.g., a tagged GitHub release with
+      an archived DOI) and reference it in the manuscript.
+
+2. Attribution of the underlying methods.
+VSN, KNN imputation, Bayesian PCA, the hypergeometric enrichment test, and the
+differential expression model are all established methods with primary
+literature and, in most cases, widely used reference implementations. In the
+current manuscript they are reimplemented in-house and cited only to OmniProt
+itself. Please:
+   a. Cite the original method publications and the corresponding reference
+      tools/packages for each of these components.
+   b. State explicitly, for each component, whether OmniProt wraps an existing
+      implementation or reimplements the method from scratch.
+   c. Because independent reimplementations can diverge from their references,
+      demonstrate numerical concordance between the OmniProt implementation and
+      the established reference implementation on at least one dataset for each
+      reimplemented method.
+
+3. Enrichment background (statistical validity).
+The default background (the universe) for the enrichment analysis appears to be
+the entire gene-set library rather than the set of proteins actually quantified
+in the experiment. Using the full library as the background inflates
+significance, because the universe is larger and less specific than the
+population the proteins were actually drawn from. Furthermore, the manuscript
+does not state which background is used. Please:
+   a. State explicitly in the Methods which background is applied.
+   b. Use the quantified proteome (the detected/quantified background) as the
+      default, or at minimum offer it as a clearly documented option, and
+      justify the choice.
+   c. Report how the enrichment results change when the correct (quantified
+      proteome) background is used, so the impact on the reported findings is
+      transparent.
+
+4. Biological validation in Case Study 1.
+The claim that OmniProt "recovers known biology" currently rests on a comparison
+to the same group's earlier dataset, which is not available. Because that
+reference is neither independent nor accessible, the validation is effectively
+circular and cannot be checked by a reader. Please either:
+   a. Validate against an independent, publicly available benchmark or a dataset
+      with an established ground truth; or
+   b. Make the earlier dataset available, and in either case describe precisely
+      what was compared and by which metrics what constitutes "recovering known
+      biology."
+
+5. Example data and reproducible figures.
+No example data are provided for any module, and Figures 1-2 cite only a PRIDE
+accession with no processing details. This prevents readers from running the
+tool or regenerating the figures. Please:
+   a. Provide small, runnable example datasets for each module so users can
+      exercise the full workflow out of the box.
+   b. For each figure, provide the exact input data, parameter settings, and
+      the code needed to regenerate it from the cited raw data.
+
+Minor points
+------------
+
+6. Scientific language.
+The abstract and Methods repeatedly use promotional or subjective terms such as
+"easy-to-use", "comprehensive", and "seamless". These are not verifiable and
+weaken an otherwise technical presentation. Please replace them with specific,
+checkable statements, for example the concrete steps supported, the input
+formats accepted, and any benchmarked performance.
+
+I would be glad to reassess the manuscript once these points, especially the
+software packaging/reproducibility (1), method attribution and concordance (2),
+the enrichment background (3), and the validation (4), have been addressed.

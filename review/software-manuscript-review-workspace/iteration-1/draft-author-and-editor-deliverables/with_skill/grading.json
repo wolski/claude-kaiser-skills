@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Produces exactly the two skill-named files: review_for_authors.txt and mail_editor.txt",
+      "passed": true,
+      "evidence": "Wrote review_for_authors.txt and mail_editor.txt (exact skill filenames)."
+    },
+    {
+      "text": "Author-facing review is concise (<=1000 words, ~750 target)",
+      "passed": true,
+      "evidence": "review_for_authors.txt is 755 words (on the ~750 target)."
+    },
+    {
+      "text": "COI honored: prolfqua/prolfquapp is not cited in the author-facing review",
+      "passed": true,
+      "evidence": "prolfqua/prolfquapp count = 0 in review_for_authors.txt; named the class limma/MSstats/msqrob2/DEqMS."
+    },
+    {
+      "text": "The confidential editor note states the recommendation (major revision) with a short rationale",
+      "passed": true,
+      "evidence": "mail_editor.txt states 'Major revision, with re-review' with rationale (229 words)."
+    },
+    {
+      "text": "The formal recommendation is kept OUT of the author-facing comments (confidentiality convention)",
+      "passed": false,
+      "evidence": "The author-facing 'Overall' states 'I recommend major revision' - the formal recommendation leaked into the author comments (skill's Output-Shape template invites this)."
+    },
+    {
+      "text": "Attribution concern names reference method tools/citations feature by feature (VSN, quantile, KNN, BPCA, ORA)",
+      "passed": true,
+      "evidence": "Names VSN (Huber/vsn), quantile (Bolstad/preprocessCore), KNN (Troyanskaya/impute), BPCA (Oba/pcaMethods), ORA (clusterProfiler) feature by feature."
+    },
+    {
+      "text": "Bugs/install-failures are folded as evidence under reproducibility, with no internal QA bug-list in the author review",
+      "passed": true,
+      "evidence": "Install failure/hard-coded paths stated once under the reproducibility concern; no file-by-file QA list."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 1,
+    "total": 7,
+    "pass_rate": 0.857
+  }
+}

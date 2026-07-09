@@ -1,0 +1,13 @@
+{
+  "eval_id": 0,
+  "eval_name": "review-framing-and-scope",
+  "prompt": "How should I frame my first-round review of the OmniProt integrated-platform manuscript; what are the main concerns; what goes to authors vs editor vs private?",
+  "assertions": [
+    "Separates what goes to the authors, to the editor, and what is kept private",
+    "Frames reuse/attribution/validation of established methods as the governing thesis for an integrated-platform paper (not a bug hunt)",
+    "Preserves confidentiality: warns against opening GitHub issues / contacting authors via the repo, and flags the journal AI-in-review policy",
+    "Applies the 'reviewer is not the authors' QA' framing (bugs as evidence for the thesis, not a debugging service)",
+    "Handles COI correctly: names the class of DEA tools and does not cite the reviewer's own package in the submittable text",
+    "Recommends a concise, thesis-first, human-voiced review (~750 words) rather than a five-page audit"
+  ]
+}

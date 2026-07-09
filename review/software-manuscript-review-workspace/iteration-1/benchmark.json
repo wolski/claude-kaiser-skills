@@ -1,0 +1,271 @@
+{
+  "metadata": {
+    "skill_name": "software-manuscript-review",
+    "timestamp": "2026-07-09T00:00:00Z",
+    "executor_model": "opus",
+    "evals_run": [
+      0,
+      1
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "review-framing-and-scope",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 251.0,
+        "tokens": 50757,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Separates what goes to the authors, to the editor, and what is kept private",
+          "passed": true,
+          "evidence": "Section 3 explicitly splits To the authors / To the editor / Keep private."
+        },
+        {
+          "text": "Frames reuse/attribution/validation of established methods as the governing thesis for an integrated-platform paper (not a bug hunt)",
+          "passed": true,
+          "evidence": "Section 1 states reuse/attribution/validation + reproducibility is the governing thesis for an integrated platform, not a bug hunt."
+        },
+        {
+          "text": "Preserves confidentiality: warns against opening GitHub issues / contacting authors via the repo, and flags the journal AI-in-review policy",
+          "passed": true,
+          "evidence": "Section 6 warns 'Do NOT open GitHub issues', preserve anonymity, and check the journal AI-use policy (Section 0)."
+        },
+        {
+          "text": "Applies the 'reviewer is not the authors' QA' framing (bugs as evidence for the thesis, not a debugging service)",
+          "passed": true,
+          "evidence": "Section 1/2 state the install failure etc. are reproducibility evidence and 'not something you should resolve by debugging their scripts'."
+        },
+        {
+          "text": "Handles COI correctly: names the class of DEA tools and does not cite the reviewer's own package in the submittable text",
+          "passed": false,
+          "evidence": "Flagged the COI up front and named the class, BUT the drafted review_for_authors.txt lists 'prolfqua' inside the DEA class in the SUBMITTED text (prolfqua count=1) - the reviewer's own package should not be cited in the submitted review at all."
+        },
+        {
+          "text": "Recommends a concise, thesis-first, human-voiced review (~750 words) rather than a five-page audit",
+          "passed": true,
+          "evidence": "Recommends thesis-first, ~750-word review; its own drafted review is 759 words."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "review-framing-and-scope",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.333,
+        "passed": 2,
+        "failed": 4,
+        "total": 6,
+        "time_seconds": 203.0,
+        "tokens": 34832,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Separates what goes to the authors, to the editor, and what is kept private",
+          "passed": true,
+          "evidence": "Sections 4/5/6 separate authors / editor / keep-private thoroughly."
+        },
+        {
+          "text": "Frames reuse/attribution/validation of established methods as the governing thesis for an integrated-platform paper (not a bug hunt)",
+          "passed": false,
+          "evidence": "Lists concerns with reproducibility as M1 and attribution as M3; does not frame reuse/attribution/validation as the governing thesis for an integrated platform."
+        },
+        {
+          "text": "Preserves confidentiality: warns against opening GitHub issues / contacting authors via the repo, and flags the journal AI-in-review policy",
+          "passed": true,
+          "evidence": "Section 6 says 'Do NOT open GitHub issues' and covers the AI-assistance policy."
+        },
+        {
+          "text": "Applies the 'reviewer is not the authors' QA' framing (bugs as evidence for the thesis, not a debugging service)",
+          "passed": false,
+          "evidence": "No 'reviewer is not the authors' QA' framing; treats findings as concerns to raise, not evidence-for-a-thesis."
+        },
+        {
+          "text": "Handles COI correctly: names the class of DEA tools and does not cite the reviewer's own package in the submittable text",
+          "passed": false,
+          "evidence": "Suggests benchmarking against 'limma, MSstats, DEqMS, proDA' and lists prolfqua among existing tools; no COI awareness."
+        },
+        {
+          "text": "Recommends a concise, thesis-first, human-voiced review (~750 words) rather than a five-page audit",
+          "passed": false,
+          "evidence": "Very long multi-section guidance doc; no conciseness/word-target guidance."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "draft-author-and-editor-deliverables",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 203.4,
+        "tokens": 49900,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Produces exactly the two skill-named files: review_for_authors.txt and mail_editor.txt",
+          "passed": true,
+          "evidence": "Wrote review_for_authors.txt and mail_editor.txt (exact skill filenames)."
+        },
+        {
+          "text": "Author-facing review is concise (<=1000 words, ~750 target)",
+          "passed": true,
+          "evidence": "review_for_authors.txt is 755 words (on the ~750 target)."
+        },
+        {
+          "text": "COI honored: prolfqua/prolfquapp is not cited in the author-facing review",
+          "passed": true,
+          "evidence": "prolfqua/prolfquapp count = 0 in review_for_authors.txt; named the class limma/MSstats/msqrob2/DEqMS."
+        },
+        {
+          "text": "The confidential editor note states the recommendation (major revision) with a short rationale",
+          "passed": true,
+          "evidence": "mail_editor.txt states 'Major revision, with re-review' with rationale (229 words)."
+        },
+        {
+          "text": "The formal recommendation is kept OUT of the author-facing comments (confidentiality convention)",
+          "passed": false,
+          "evidence": "The author-facing 'Overall' states 'I recommend major revision' - the formal recommendation leaked into the author comments (skill's Output-Shape template invites this)."
+        },
+        {
+          "text": "Attribution concern names reference method tools/citations feature by feature (VSN, quantile, KNN, BPCA, ORA)",
+          "passed": true,
+          "evidence": "Names VSN (Huber/vsn), quantile (Bolstad/preprocessCore), KNN (Troyanskaya/impute), BPCA (Oba/pcaMethods), ORA (clusterProfiler) feature by feature."
+        },
+        {
+          "text": "Bugs/install-failures are folded as evidence under reproducibility, with no internal QA bug-list in the author review",
+          "passed": true,
+          "evidence": "Install failure/hard-coded paths stated once under the reproducibility concern; no file-by-file QA list."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "draft-author-and-editor-deliverables",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 98.7,
+        "tokens": 30617,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Produces exactly the two skill-named files: review_for_authors.txt and mail_editor.txt",
+          "passed": true,
+          "evidence": "Wrote review_for_authors.txt and mail_editor.txt (matched the skill filenames despite no skill)."
+        },
+        {
+          "text": "Author-facing review is concise (<=1000 words, ~750 target)",
+          "passed": true,
+          "evidence": "review_for_authors.txt is 846 words (>~750 target but under the 1000 cap)."
+        },
+        {
+          "text": "COI honored: prolfqua/prolfquapp is not cited in the author-facing review",
+          "passed": true,
+          "evidence": "prolfqua/prolfquapp count = 0 in review_for_authors.txt."
+        },
+        {
+          "text": "The confidential editor note states the recommendation (major revision) with a short rationale",
+          "passed": true,
+          "evidence": "mail_editor.txt states the major-revision recommendation with rationale (342 words)."
+        },
+        {
+          "text": "The formal recommendation is kept OUT of the author-facing comments (confidentiality convention)",
+          "passed": true,
+          "evidence": "Author file contains no formal recommendation (count=0); baseline explicitly withheld it 'per confidentiality convention'."
+        },
+        {
+          "text": "Attribution concern names reference method tools/citations feature by feature (VSN, quantile, KNN, BPCA, ORA)",
+          "passed": true,
+          "evidence": "Requests primary citations for VSN, KNN, BPCA, hypergeometric test, and the DEA model, feature by feature."
+        },
+        {
+          "text": "Bugs/install-failures are folded as evidence under reproducibility, with no internal QA bug-list in the author review",
+          "passed": true,
+          "evidence": "Kept findings at reviewer altitude; framed asks to authors, no internal QA list."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.845,
+        "stddev": 0.012,
+        "min": 0.833,
+        "max": 0.857
+      },
+      "time_seconds": {
+        "mean": 227.2,
+        "stddev": 23.8,
+        "min": 203.4,
+        "max": 251.0
+      },
+      "tokens": {
+        "mean": 50328.5,
+        "stddev": 428.5,
+        "min": 49900,
+        "max": 50757
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.666,
+        "stddev": 0.334,
+        "min": 0.333,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 150.85,
+        "stddev": 52.15,
+        "min": 98.7,
+        "max": 203.0
+      },
+      "tokens": {
+        "mean": 32724.5,
+        "stddev": 2107.5,
+        "min": 30617,
+        "max": 34832
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.179",
+      "time_seconds": "+76.3",
+      "tokens": "+17604"
+    }
+  },
+  "notes": [
+    "Aggregate hides a split: on eval-0 (framing) the skill helps a lot (+0.50), on eval-1 (drafting) it slightly HURT (-0.14) - do not read the mean alone.",
+    "Skill value is concentrated in JUDGMENT/framing (thesis-first attribution, not-the-QA, confidentiality, author/editor/private split), not in mechanical drafting, which a strong model already does well unaided.",
+    "FINDING 1 (skill bug): the author-facing template's 'Overall' invites the formal recommendation into review_for_authors.txt; the with_skill drafting run leaked 'I recommend major revision' there, while the baseline correctly withheld it. Fix: keep the formal recommendation in mail_editor.txt only; make 'Overall' an assessment without the accept/reject verdict.",
+    "FINDING 2 (skill bug): the COI rule ('name the class, don't single out your own package') let the framing run cite prolfqua as one of a class in the SUBMITTED text. Fix: state explicitly that the reviewer's own package must not be cited in the submitted review at all, even within a class list.",
+    "eval-1 baseline scored 7/7 vs with_skill 6/7 - honest evidence the skill did not add value on the pure drafting task and needs the two fixes above.",
+    "Single run per configuration: pass-rate stddev here is between-eval variance, not run-to-run flakiness. For a real verdict, run each config 3x."
+  ]
+}

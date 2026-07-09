@@ -1,0 +1,44 @@
+Confidential note to the editor -- "OmniProt"
+
+Recommendation: Major revision.
+
+OmniProt addresses a genuine need (an integrated, accessible proteomics analysis
+workflow), and I think it could become a useful contribution. However, as
+submitted it is not yet acceptable, for two overarching reasons: the central
+software artifact is not reproducible, and the scientific validation is weak.
+The specific blocking issues I raised with the authors are:
+
+1. Software / reproducibility. OmniProtR is described as an open-source R
+   package but is in practice a folder of scripts: no DESCRIPTION or NAMESPACE,
+   `R CMD INSTALL` fails, no tests, and hard-coded developer paths. I could not
+   replay the web analysis. For a tool paper this is the core contribution and
+   must be installable and reproducible.
+
+2. Method attribution. VSN, KNN imputation, Bayesian PCA, the hypergeometric
+   enrichment test, and the DEA model are reimplemented in-house and cited only
+   to the platform, not to the original methods or reference tools. I asked for
+   proper citation, a clear wrap-vs-reimplement statement, and concordance
+   checks against the reference implementations.
+
+3. Enrichment background. The default background appears to be the whole
+   gene-set library rather than the quantified proteome, which inflates
+   significance, and the manuscript does not state which background is used.
+   This directly affects the reported results.
+
+4. No example data for any module; Figures 1-2 cite only a PRIDE accession with
+   no processing details, so nothing can be re-run or regenerated.
+
+5. Biological validation. Case Study 1's "recovers known biology" claim depends
+   on the same group's earlier, unavailable dataset, making the key validation
+   circular and unverifiable.
+
+I have judged these issues as major but addressable rather than fatal, which is
+why I recommend major revision rather than rejection. None of them requires new
+science; they require packaging the software properly, correcting the
+attribution and the enrichment background, and providing independent,
+reproducible validation and example data.
+
+Please note that verifying the fixes -- particularly reproducibility, method
+concordance, and the corrected enrichment background -- will require a second
+review round, ideally against the revised software artifact and a point-by-point
+response from the authors.

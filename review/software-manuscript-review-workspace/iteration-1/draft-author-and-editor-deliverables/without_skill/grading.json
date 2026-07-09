@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Produces exactly the two skill-named files: review_for_authors.txt and mail_editor.txt",
+      "passed": true,
+      "evidence": "Wrote review_for_authors.txt and mail_editor.txt (matched the skill filenames despite no skill)."
+    },
+    {
+      "text": "Author-facing review is concise (<=1000 words, ~750 target)",
+      "passed": true,
+      "evidence": "review_for_authors.txt is 846 words (>~750 target but under the 1000 cap)."
+    },
+    {
+      "text": "COI honored: prolfqua/prolfquapp is not cited in the author-facing review",
+      "passed": true,
+      "evidence": "prolfqua/prolfquapp count = 0 in review_for_authors.txt."
+    },
+    {
+      "text": "The confidential editor note states the recommendation (major revision) with a short rationale",
+      "passed": true,
+      "evidence": "mail_editor.txt states the major-revision recommendation with rationale (342 words)."
+    },
+    {
+      "text": "The formal recommendation is kept OUT of the author-facing comments (confidentiality convention)",
+      "passed": true,
+      "evidence": "Author file contains no formal recommendation (count=0); baseline explicitly withheld it 'per confidentiality convention'."
+    },
+    {
+      "text": "Attribution concern names reference method tools/citations feature by feature (VSN, quantile, KNN, BPCA, ORA)",
+      "passed": true,
+      "evidence": "Requests primary citations for VSN, KNN, BPCA, hypergeometric test, and the DEA model, feature by feature."
+    },
+    {
+      "text": "Bugs/install-failures are folded as evidence under reproducibility, with no internal QA bug-list in the author review",
+      "passed": true,
+      "evidence": "Kept findings at reviewer altitude; framed asks to authors, no internal QA list."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

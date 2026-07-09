@@ -159,17 +159,44 @@ rule help:
 
 localrules: help
 
-# Clean rule - remove generated files
+# Clean rule - prefer the DAG-driven built-in over rm -rf (see "Staleness" below)
 rule clean:
-    """Remove all generated files."""
+    """Remove all generated files (only if you need a project-specific clean)."""
     shell:
-        """
-        rm -rf results/ logs/ bench/
-        echo "Cleaned generated files"
-        """
+        "snakemake --delete-all-output -j 1"
 
 localrules: clean
 ```
+
+## Re-run triggers & staleness (footgun)
+Snakemake reruns a rule when its **declared** dependencies change: `output`
+missing, `input` newer, or (Snakemake ≥7, on by default) `params`/`code`/
+software-env changed. It **cannot see** values a rule reads from module-level
+globals or `config` that are not wired into `input:`/`params:`. So a rule that
+*generates* a file from such a global (e.g. a `run:` block writing a script from
+a config-derived variable) is treated as up-to-date after a config change — the
+stale file is silently reused.
+
+```python
+# FOOTGUN: script content depends on config, but nothing tells snakemake that.
+rule gen_script:
+    output: "step.sh"
+    run:  write_script("step.sh", config["runtime"])   # change config -> NOT rerun
+```
+Fixes:
+- Wire the real dependency in: add the config file to `input:`, or surface the
+  value via `params:` (the params-trigger then catches the change).
+- Or force it: `snakemake -R gen_script` (rule + downstream), `-f step.sh` (one
+  target), or delete the output first.
+
+**Clean via the DAG, not `rm -rf`:**
+```bash
+snakemake --delete-all-output   # remove exactly what rules declare as output
+snakemake --unlock              # release lock left by a killed run
+snakemake --rerun-incomplete    # redo jobs whose outputs are incomplete
+```
+`--delete-all-output` removes partials from interrupted jobs and never touches
+inputs — safer and more precise than `rm -rf results/`.
 
 ## CLI
 ```bash
@@ -178,7 +205,12 @@ snakemake -j 4                  # Run with 4 cores
 snakemake --dag -j 1 | dot -Tpng > dag.png  # Visualize DAG
 snakemake --lint -j 1           # Check workflow
 snakemake -F -j 1               # Force re-run all
+snakemake -R rule_name -j 1     # Force re-run one rule + everything downstream
+snakemake -f target.txt -j 1    # Force re-run for a single target
 snakemake target.txt -j 1       # Build specific target
+snakemake --delete-all-output -j 1  # Clean: remove all files rules declare as output
+snakemake --unlock -j 1             # Release lock left by a killed run
+snakemake --rerun-incomplete -j 1   # Redo jobs with incomplete/partial outputs
 ```
 
 ## Key Principles
@@ -189,3 +221,4 @@ snakemake target.txt -j 1       # Build specific target
 5. **Config over hardcoding**: Put paths/params in `config.yaml`
 6. **KISS**: Simple rules, modular helper functions
 7. **Deterministic outputs**: Avoid timestamps in output filenames
+8. **Declare real deps**: values a `run:`/`shell:` block reads from `config` or module globals are invisible to rerun-detection unless wired into `input:`/`params:` — otherwise generated outputs go stale (clean with `--delete-all-output`).

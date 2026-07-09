@@ -1,0 +1,81 @@
+Review of OmniProt (Manuscript ID: [ID])
+
+Summary
+
+OmniProt addresses a real need: a single environment that carries MaxQuant, FragPipe,
+and DIA-NN outputs through a standard downstream workflow (QC, normalization, imputation,
+differential expression, and functional enrichment). Lowering the barrier to a
+consistent, end-to-end analysis across these upstream tools is a legitimate and useful
+contribution. My concerns are not with the goal but with whether the manuscript, as it
+stands, supports its central claims of transparency, reproducibility, and methodological
+soundness. The three major points below are, in my view, blocking for publication.
+
+Major concerns
+
+1. The released software does not support the transparency/reproducibility claim.
+The Availability section states that OmniProtR is released "for full transparency and
+reproducibility," but the repository as provided is a directory of R scripts rather than
+an installable package: it has no DESCRIPTION or NAMESPACE, and R CMD INSTALL fails.
+Several functions contain hard-coded absolute paths (/home/dev/...), so the code cannot
+run outside the authors' machine, and there are no automated tests and no example data.
+As a result, an independent reader cannot install OmniProtR, run it, or reproduce any
+result in the manuscript. Please (a) package the code so it installs cleanly
+(DESCRIPTION/NAMESPACE, declared dependencies, no hard-coded paths); (b) include a small
+runnable example dataset for each supported input (MaxQuant, FragPipe, DIA-NN) together
+with a script that regenerates the main figures end to end; and (c) add tests that
+exercise the core analytical steps, not just application startup. Source availability on
+its own is weaker evidence than a workflow a reader can actually run.
+
+2. Established methods are used without attribution or validation.
+Each analytical step relies on a well-established method, but the manuscript gives no
+primary citation for VSN, quantile normalization, KNN or Bayesian PCA imputation, the
+enrichment test, or any reference differential-expression framework. For an integrated
+platform this is the central issue: integration is a valid contribution, but it does not
+license re-using or re-implementing established methods without crediting and validating
+them. Please cite the methods you use, feature by feature, for example: quantile
+normalization (Bolstad et al., 2003; preprocessCore), VSN (Huber et al., 2002; vsn), KNN
+imputation (Troyanskaya et al., 2001; impute), Bayesian PCA (Oba et al., 2003;
+pcaMethods), the moderated t-test (Smyth, 2004; limma), and the enrichment test itself
+(e.g. a hypergeometric test as implemented in clusterProfiler, Wu et al., 2021) as
+distinct from the gene-set databases GO (Ashburner et al., 2000) and KEGG (Kanehisa &
+Goto, 2000). For differential expression, please also position OmniProt relative to the
+established proteomics DEA frameworks (limma/DEqMS, MSstats, msqrob2, prolfqua). Where you
+wrap the community package, cite it; where you re-implement a method in-house, state why
+the reference tool was not reused and validate your implementation against it (for
+example, concordance on a shared dataset). Because the code cannot currently be run, the
+correctness of these steps cannot be verified.
+
+3. The methods are underspecified, so correctness and reproducibility cannot be assessed.
+Key details are missing. For differential expression, please state the implementation
+used, the experimental design/contrasts, the scale on which the test is applied, and the
+multiple-testing correction. For enrichment, please state the exact test, the
+background/universe, the GO namespaces considered, and the FDR method. For imputation,
+give the KNN k and the axis used and the Bayesian PCA settings; for normalization, state
+whether it is applied per sample and on the log scale. These are needed both to judge
+correctness and to reproduce results.
+
+Minor concerns
+
+- Please add a workflow diagram and a brief rationale for the choice of methods, and
+  confirm that each stage's output feeds the next (QC -> normalization -> imputation ->
+  differential expression -> enrichment), so the platform reads as a coherent pipeline
+  rather than a set of independent utilities.
+
+- Please replace promotional language ("easy-to-use," "comprehensive," "single seamless
+  environment," "full transparency and reproducibility") with specific, verifiable
+  statements about the supported inputs, the tested workflows, and the limitations. The
+  reproducibility claim in particular is currently contradicted by the state of the
+  released code.
+
+- Please confirm that parsing of MaxQuant, FragPipe, and DIA-NN outputs is robust to
+  version differences and fails with a clear message rather than silently dropping
+  columns or files.
+
+Overall
+
+The integration goal is worthwhile, but in its current form the manuscript's central
+claims of transparency, reproducibility, and methodological rigor are not supported by
+the released software or the methods text. I recommend major revision, with re-review
+once the package installs and runs on example data, the methods are fully specified, and
+the established methods are properly attributed and, where re-implemented, validated
+against their reference implementations.

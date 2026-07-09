@@ -1,0 +1,21 @@
+Recommendation: Major revision with re-review.
+
+OmniProt targets a genuine need -- a single environment that carries MaxQuant, FragPipe,
+and DIA-NN outputs through QC, normalization, imputation, differential expression, and
+enrichment -- and integration of this kind is a legitimate contribution. However, the
+paper's central claims are not currently supported. The "open-source OmniProtR package
+... for full transparency and reproducibility" is in practice a folder of R scripts with
+no DESCRIPTION/NAMESPACE that fails to install (R CMD INSTALL), contains hard-coded
+absolute paths, and ships no tests or example data, so no result can be reproduced by an
+independent reader. The manuscript also uses established methods (VSN, quantile
+normalization, KNN and Bayesian PCA imputation, the moderated t-test, and GO/KEGG
+enrichment) without primary citations or any validation, and the methods are
+underspecified (test and background details, FDR, imputation and normalization
+parameters), so correctness cannot be assessed. These are reproducibility- and
+correctness-level issues that require re-evaluation after revision rather than editorial
+polish; I therefore recommend major revision with re-review.
+
+Note: I have a potential conflict of interest, as I am an author of one of the
+established differential-expression frameworks (prolfqua) relevant to this manuscript. I
+have framed the attribution point around the general class of established tools rather
+than any single package.

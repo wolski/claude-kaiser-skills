@@ -1,0 +1,24 @@
+Recommendation: Major revision, with re-review.
+
+OmniProt integrates MaxQuant, FragPipe, and DIA-NN outputs through a single
+downstream workflow (QC, normalization, imputation, differential expression,
+enrichment) in one accessible web environment, which is a genuinely useful goal.
+However, the submission does not support its transparency and reproducibility
+claims: the "open-source OmniProtR package" is a folder of scripts that does not
+install, has no tests, and contains hard-coded developer paths, and with no
+example data and no figure-regeneration recipe, none of the manuscript's
+analyses can be reproduced. Compounding this, the core methods (VSN, KNN,
+Bayesian PCA, the enrichment test, and the DEA model) are re-implemented
+in-house, cited only to the platform, and not validated against the established
+reference tools, so their correctness is currently unverifiable; separately, the
+enrichment test uses the whole gene-set library rather than the quantified
+proteome as background (which inflates significance and is undocumented), and the
+main biological validation rests on an unavailable in-house dataset, making it
+circular. These issues are correctable but go to the heart of the paper's
+claims, which is why I recommend major revision with re-review rather than a
+lighter decision.
+
+Confidential note on potential conflict: I develop differential-expression
+software in this area, so I have deliberately framed the attribution point around
+the general class of established proteomics DEA frameworks rather than any single
+package, including my own. Please weigh my comments with that in mind.

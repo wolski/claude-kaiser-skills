@@ -1,0 +1,631 @@
+Split: 12 train, 8 test (holdout=0.4)
+
+============================================================
+Iteration 1/2
+Description: Evidence-first workflow for peer-reviewing software and tool manuscripts (bioinformatics/proteomics tool papers, web servers, R/Python packages), author response letters, and revision rounds. Use this skill whenever the user is acting as a reviewer or referee of a submitted paper about software — for example, they agreed to review a submission, need to verify the authors' claims against the code or manuscript, are auditing reproducibility/tests/example data, are checking whether a described method or metric is actually implemented correctly, are assessing an "integrated platform" for reuse and attribution of established tools, are handling reviewer confidentiality or a journal AI-use policy, or need to draft the comments to the authors and the confidential note to the editor — even if they do not say the word "review" or name this skill. Also use it for revision rounds, verifying response-letter promises against the revised code. Do NOT use it when the user is writing or defending their OWN paper, doing a plain code or pull-request review, or reviewing a manuscript with no software component.
+============================================================
+Train: 18/36 correct, precision=100% recall=0% accuracy=50% (153.9s)
+  [FAIL] rate=0/3 expected=True: I need to write the confidential note to the editor and the
+  [FAIL] rate=0/3 expected=True: The manuscript describes an isoelectric-point calculation an
+  [FAIL] rate=0/3 expected=True: im a reviewer for the protein science tools issue. the submi
+  [FAIL] rate=0/3 expected=True: I agreed to review a submission for JPR — it's a Shiny app f
+  [FAIL] rate=0/3 expected=True: review this tool paper for me — it's an 'integrated platform
+  [FAIL] rate=0/3 expected=True: Can you help me verify whether the authors of this bioinform
+  [PASS] rate=0/3 expected=False: Check the software/data-management plan in my CIHR grant pro
+  [PASS] rate=0/3 expected=False: Review my pull request that refactors the normalization modu
+  [PASS] rate=0/3 expected=False: Write a point-by-point rebuttal responding to the three revi
+  [PASS] rate=0/3 expected=False: Summarize this proteomics tool paper (attached PDF) for our
+  [PASS] rate=0/3 expected=False: Help me write the Methods section for my own proteomics tool
+  [PASS] rate=0/3 expected=False: Draft a GitHub issue reporting that the KNN imputation in Pr
+Test : 12/24 correct, precision=100% recall=0% accuracy=50% (0.0s)
+  [FAIL] rate=0/3 expected=True: Help me audit the reproducibility claims of this web-tool ma
+  [FAIL] rate=0/3 expected=True: peer review for Bioinformatics: the manuscript claims the to
+  [FAIL] rate=0/3 expected=True: I'm on round 2 of a review. The authors' response letter say
+  [PASS] rate=0/3 expected=False: Can you improve the description field of my software-manuscr
+  [FAIL] rate=0/3 expected=True: Does this paper's Supplementary Table comparing their tool a
+  [PASS] rate=0/3 expected=False: Install this R package from its GitHub repo and run its exam
+  [PASS] rate=0/3 expected=False: Benchmark prolfqua against MSstats on this DIA dataset in ~/
+  [PASS] rate=0/3 expected=False: I'm reviewing a wet-lab manuscript about palmitate effects o
+
+Improving description...
+Proposed (85.4s): Use when acting as peer reviewer or referee of someone else's submitted software or tool manuscript — bioinformatics/proteomics tool paper, web server, or R/Python package — writing a referee report, not a plain code review. Triggers: agreeing to review a submission, setting up a review folder, going through a manuscript's claims one by one, verifying that described methods, metrics, or algorithms are actually implemented and computed correctly in the code, auditing reproducibility/tests/example data, assessing an "integrated platform" that reimplements established tools (reuse/attribution), handling reviewer confidentiality or a journal AI-use policy, drafting comments-to-authors plus the confidential note-to-editor, including revision rounds checking response-letter promises against revised code. Trigger even if the user never says "review." Do NOT use when the user writes or defends their own paper, does a plain code/pull-request review, or reviews a manuscript with no software component.
+
+============================================================
+Iteration 2/2
+Description: Use when acting as peer reviewer or referee of someone else's submitted software or tool manuscript — bioinformatics/proteomics tool paper, web server, or R/Python package — writing a referee report, not a plain code review. Triggers: agreeing to review a submission, setting up a review folder, going through a manuscript's claims one by one, verifying that described methods, metrics, or algorithms are actually implemented and computed correctly in the code, auditing reproducibility/tests/example data, assessing an "integrated platform" that reimplements established tools (reuse/attribution), handling reviewer confidentiality or a journal AI-use policy, drafting comments-to-authors plus the confidential note-to-editor, including revision rounds checking response-letter promises against revised code. Trigger even if the user never says "review." Do NOT use when the user writes or defends their own paper, does a plain code/pull-request review, or reviews a manuscript with no software component.
+============================================================
+Train: 18/36 correct, precision=100% recall=0% accuracy=50% (143.9s)
+  [FAIL] rate=0/3 expected=True: I need to write the confidential note to the editor and the
+  [FAIL] rate=0/3 expected=True: The manuscript describes an isoelectric-point calculation an
+  [FAIL] rate=0/3 expected=True: im a reviewer for the protein science tools issue. the submi
+  [FAIL] rate=0/3 expected=True: review this tool paper for me — it's an 'integrated platform
+  [FAIL] rate=0/3 expected=True: I agreed to review a submission for JPR — it's a Shiny app f
+  [FAIL] rate=0/3 expected=True: Can you help me verify whether the authors of this bioinform
+  [PASS] rate=0/3 expected=False: Review my pull request that refactors the normalization modu
+  [PASS] rate=0/3 expected=False: Check the software/data-management plan in my CIHR grant pro
+  [PASS] rate=0/3 expected=False: Write a point-by-point rebuttal responding to the three revi
+  [PASS] rate=0/3 expected=False: Summarize this proteomics tool paper (attached PDF) for our
+  [PASS] rate=0/3 expected=False: Help me write the Methods section for my own proteomics tool
+  [PASS] rate=0/3 expected=False: Draft a GitHub issue reporting that the KNN imputation in Pr
+Test : 12/24 correct, precision=100% recall=0% accuracy=50% (0.0s)
+  [FAIL] rate=0/3 expected=True: Help me audit the reproducibility claims of this web-tool ma
+  [FAIL] rate=0/3 expected=True: peer review for Bioinformatics: the manuscript claims the to
+  [FAIL] rate=0/3 expected=True: I'm on round 2 of a review. The authors' response letter say
+  [FAIL] rate=0/3 expected=True: Does this paper's Supplementary Table comparing their tool a
+  [PASS] rate=0/3 expected=False: Can you improve the description field of my software-manuscr
+  [PASS] rate=0/3 expected=False: Install this R package from its GitHub repo and run its exam
+  [PASS] rate=0/3 expected=False: Benchmark prolfqua against MSstats on this DIA dataset in ~/
+  [PASS] rate=0/3 expected=False: I'm reviewing a wet-lab manuscript about palmitate effects o
+
+Max iterations reached (2).
+
+Exit reason: max_iterations (2)
+Best score: 4/8 (iteration 1)
+
+Report: /var/folders/1v/ykbbqt_143g35h0h2w348jh40000gn/T/skill_description_report_software-manuscript-review_20260709_161218.html
+Results saved to: /Users/wolski/projects/wews_skill_coordinator/repos/claude-kaiser-skills/review/software-manuscript-review-workspace/desc-opt-2/2026-07-09_161218
+{
+  "exit_reason": "max_iterations (2)",
+  "original_description": "Evidence-first workflow for peer-reviewing software and tool manuscripts (bioinformatics/proteomics tool papers, web servers, R/Python packages), author response letters, and revision rounds. Use this skill whenever the user is acting as a reviewer or referee of a submitted paper about software \u2014 for example, they agreed to review a submission, need to verify the authors' claims against the code or manuscript, are auditing reproducibility/tests/example data, are checking whether a described method or metric is actually implemented correctly, are assessing an \"integrated platform\" for reuse and attribution of established tools, are handling reviewer confidentiality or a journal AI-use policy, or need to draft the comments to the authors and the confidential note to the editor \u2014 even if they do not say the word \"review\" or name this skill. Also use it for revision rounds, verifying response-letter promises against the revised code. Do NOT use it when the user is writing or defending their OWN paper, doing a plain code or pull-request review, or reviewing a manuscript with no software component.",
+  "best_description": "Evidence-first workflow for peer-reviewing software and tool manuscripts (bioinformatics/proteomics tool papers, web servers, R/Python packages), author response letters, and revision rounds. Use this skill whenever the user is acting as a reviewer or referee of a submitted paper about software \u2014 for example, they agreed to review a submission, need to verify the authors' claims against the code or manuscript, are auditing reproducibility/tests/example data, are checking whether a described method or metric is actually implemented correctly, are assessing an \"integrated platform\" for reuse and attribution of established tools, are handling reviewer confidentiality or a journal AI-use policy, or need to draft the comments to the authors and the confidential note to the editor \u2014 even if they do not say the word \"review\" or name this skill. Also use it for revision rounds, verifying response-letter promises against the revised code. Do NOT use it when the user is writing or defending their OWN paper, doing a plain code or pull-request review, or reviewing a manuscript with no software component.",
+  "best_score": "4/8",
+  "best_train_score": "6/12",
+  "best_test_score": "4/8",
+  "final_description": "Use when acting as peer reviewer or referee of someone else's submitted software or tool manuscript \u2014 bioinformatics/proteomics tool paper, web server, or R/Python package \u2014 writing a referee report, not a plain code review. Triggers: agreeing to review a submission, setting up a review folder, going through a manuscript's claims one by one, verifying that described methods, metrics, or algorithms are actually implemented and computed correctly in the code, auditing reproducibility/tests/example data, assessing an \"integrated platform\" that reimplements established tools (reuse/attribution), handling reviewer confidentiality or a journal AI-use policy, drafting comments-to-authors plus the confidential note-to-editor, including revision rounds checking response-letter promises against revised code. Trigger even if the user never says \"review.\" Do NOT use when the user writes or defends their own paper, does a plain code/pull-request review, or reviews a manuscript with no software component.",
+  "iterations_run": 2,
+  "holdout": 0.4,
+  "train_size": 12,
+  "test_size": 8,
+  "history": [
+    {
+      "iteration": 1,
+      "description": "Evidence-first workflow for peer-reviewing software and tool manuscripts (bioinformatics/proteomics tool papers, web servers, R/Python packages), author response letters, and revision rounds. Use this skill whenever the user is acting as a reviewer or referee of a submitted paper about software \u2014 for example, they agreed to review a submission, need to verify the authors' claims against the code or manuscript, are auditing reproducibility/tests/example data, are checking whether a described method or metric is actually implemented correctly, are assessing an \"integrated platform\" for reuse and attribution of established tools, are handling reviewer confidentiality or a journal AI-use policy, or need to draft the comments to the authors and the confidential note to the editor \u2014 even if they do not say the word \"review\" or name this skill. Also use it for revision rounds, verifying response-letter promises against the revised code. Do NOT use it when the user is writing or defending their OWN paper, doing a plain code or pull-request review, or reviewing a manuscript with no software component.",
+      "train_passed": 6,
+      "train_failed": 6,
+      "train_total": 12,
+      "train_results": [
+        {
+          "query": "I need to write the confidential note to the editor and the comments to the authors for this software submission. My verified findings are in evaluation/. Keep the author comments short.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "The manuscript describes an isoelectric-point calculation and a GRAVY score. Can you check the R code actually computes them correctly, not just that the functions are present?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "im a reviewer for the protein science tools issue. the submission is a proteomics dashboard with a public R backend. can you set up my review folder and start going through the manuscript's claims one by one?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "I agreed to review a submission for JPR \u2014 it's a Shiny app for proteomics QC. They sent me a proof PDF and a github link to the code. where do i even start and what should i actually check?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "review this tool paper for me \u2014 it's an 'integrated platform' that reimplements a pile of standard proteomics analyses in-house. what are the main concerns i should raise?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Can you help me verify whether the authors of this bioinformatics tool paper actually implemented the methods they describe? The repo is cloned in ./submission_1/software and the manuscript md is in ./submission_1/manuscript.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Check the software/data-management plan in my CIHR grant proposal for reproducibility weaknesses a panel might flag.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Review my pull request that refactors the normalization module in our R package \u2014 check the diff for bugs and style before I merge.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Write a point-by-point rebuttal responding to the three reviewers of our tool paper; reviewer 2 is asking for benchmarking we think is out of scope.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Summarize this proteomics tool paper (attached PDF) for our lab journal club next Tuesday \u2014 one slide of pros and cons.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Help me write the Methods section for my own proteomics tool paper \u2014 we're submitting to MCP next week and I need to describe our normalization and imputation steps.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Draft a GitHub issue reporting that the KNN imputation in ProteoAnalystR returns a transposed matrix on a features-by-samples input.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "test_passed": 4,
+      "test_failed": 4,
+      "test_total": 8,
+      "test_results": [
+        {
+          "query": "Help me audit the reproducibility claims of this web-tool manuscript: whether the linked R package installs, whether it's a real package, and whether a web analysis can be replayed locally.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "peer review for Bioinformatics: the manuscript claims the tool reproduces all the figures but I can't find any example data or a way to rerun their analysis. how do I frame that as a reviewer?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "I'm on round 2 of a review. The authors' response letter says they added unit tests and fixed the normalization bug \u2014 check those claims against the updated code before I sign off.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Can you improve the description field of my software-manuscript-review skill so it triggers more reliably, and run the eval loop on it?",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Does this paper's Supplementary Table comparing their tool against Perseus and MSstats look fair to you, or is it stacked in their favour? I'm reviewing it.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Install this R package from its GitHub repo and run its example workflow on my proteinGroups.txt so I can see the output.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Benchmark prolfqua against MSstats on this DIA dataset in ~/data/dia_report.tsv and tell me which gives better FDR control.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "I'm reviewing a wet-lab manuscript about palmitate effects on human islets \u2014 no software or tool involved, just proteomics results. Help me assess whether the statistics support their conclusions.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "passed": 6,
+      "failed": 6,
+      "total": 12,
+      "results": [
+        {
+          "query": "I need to write the confidential note to the editor and the comments to the authors for this software submission. My verified findings are in evaluation/. Keep the author comments short.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "The manuscript describes an isoelectric-point calculation and a GRAVY score. Can you check the R code actually computes them correctly, not just that the functions are present?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "im a reviewer for the protein science tools issue. the submission is a proteomics dashboard with a public R backend. can you set up my review folder and start going through the manuscript's claims one by one?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "I agreed to review a submission for JPR \u2014 it's a Shiny app for proteomics QC. They sent me a proof PDF and a github link to the code. where do i even start and what should i actually check?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "review this tool paper for me \u2014 it's an 'integrated platform' that reimplements a pile of standard proteomics analyses in-house. what are the main concerns i should raise?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Can you help me verify whether the authors of this bioinformatics tool paper actually implemented the methods they describe? The repo is cloned in ./submission_1/software and the manuscript md is in ./submission_1/manuscript.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Check the software/data-management plan in my CIHR grant proposal for reproducibility weaknesses a panel might flag.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Review my pull request that refactors the normalization module in our R package \u2014 check the diff for bugs and style before I merge.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Write a point-by-point rebuttal responding to the three reviewers of our tool paper; reviewer 2 is asking for benchmarking we think is out of scope.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Summarize this proteomics tool paper (attached PDF) for our lab journal club next Tuesday \u2014 one slide of pros and cons.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Help me write the Methods section for my own proteomics tool paper \u2014 we're submitting to MCP next week and I need to describe our normalization and imputation steps.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Draft a GitHub issue reporting that the KNN imputation in ProteoAnalystR returns a transposed matrix on a features-by-samples input.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "description": "Use when acting as peer reviewer or referee of someone else's submitted software or tool manuscript \u2014 bioinformatics/proteomics tool paper, web server, or R/Python package \u2014 writing a referee report, not a plain code review. Triggers: agreeing to review a submission, setting up a review folder, going through a manuscript's claims one by one, verifying that described methods, metrics, or algorithms are actually implemented and computed correctly in the code, auditing reproducibility/tests/example data, assessing an \"integrated platform\" that reimplements established tools (reuse/attribution), handling reviewer confidentiality or a journal AI-use policy, drafting comments-to-authors plus the confidential note-to-editor, including revision rounds checking response-letter promises against revised code. Trigger even if the user never says \"review.\" Do NOT use when the user writes or defends their own paper, does a plain code/pull-request review, or reviews a manuscript with no software component.",
+      "train_passed": 6,
+      "train_failed": 6,
+      "train_total": 12,
+      "train_results": [
+        {
+          "query": "I need to write the confidential note to the editor and the comments to the authors for this software submission. My verified findings are in evaluation/. Keep the author comments short.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "The manuscript describes an isoelectric-point calculation and a GRAVY score. Can you check the R code actually computes them correctly, not just that the functions are present?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "im a reviewer for the protein science tools issue. the submission is a proteomics dashboard with a public R backend. can you set up my review folder and start going through the manuscript's claims one by one?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "review this tool paper for me \u2014 it's an 'integrated platform' that reimplements a pile of standard proteomics analyses in-house. what are the main concerns i should raise?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "I agreed to review a submission for JPR \u2014 it's a Shiny app for proteomics QC. They sent me a proof PDF and a github link to the code. where do i even start and what should i actually check?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Can you help me verify whether the authors of this bioinformatics tool paper actually implemented the methods they describe? The repo is cloned in ./submission_1/software and the manuscript md is in ./submission_1/manuscript.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Review my pull request that refactors the normalization module in our R package \u2014 check the diff for bugs and style before I merge.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Check the software/data-management plan in my CIHR grant proposal for reproducibility weaknesses a panel might flag.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Write a point-by-point rebuttal responding to the three reviewers of our tool paper; reviewer 2 is asking for benchmarking we think is out of scope.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Summarize this proteomics tool paper (attached PDF) for our lab journal club next Tuesday \u2014 one slide of pros and cons.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Help me write the Methods section for my own proteomics tool paper \u2014 we're submitting to MCP next week and I need to describe our normalization and imputation steps.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Draft a GitHub issue reporting that the KNN imputation in ProteoAnalystR returns a transposed matrix on a features-by-samples input.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "test_passed": 4,
+      "test_failed": 4,
+      "test_total": 8,
+      "test_results": [
+        {
+          "query": "Help me audit the reproducibility claims of this web-tool manuscript: whether the linked R package installs, whether it's a real package, and whether a web analysis can be replayed locally.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "peer review for Bioinformatics: the manuscript claims the tool reproduces all the figures but I can't find any example data or a way to rerun their analysis. how do I frame that as a reviewer?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "I'm on round 2 of a review. The authors' response letter says they added unit tests and fixed the normalization bug \u2014 check those claims against the updated code before I sign off.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Does this paper's Supplementary Table comparing their tool against Perseus and MSstats look fair to you, or is it stacked in their favour? I'm reviewing it.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Can you improve the description field of my software-manuscript-review skill so it triggers more reliably, and run the eval loop on it?",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Install this R package from its GitHub repo and run its example workflow on my proteinGroups.txt so I can see the output.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Benchmark prolfqua against MSstats on this DIA dataset in ~/data/dia_report.tsv and tell me which gives better FDR control.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "I'm reviewing a wet-lab manuscript about palmitate effects on human islets \u2014 no software or tool involved, just proteomics results. Help me assess whether the statistics support their conclusions.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "passed": 6,
+      "failed": 6,
+      "total": 12,
+      "results": [
+        {
+          "query": "I need to write the confidential note to the editor and the comments to the authors for this software submission. My verified findings are in evaluation/. Keep the author comments short.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "The manuscript describes an isoelectric-point calculation and a GRAVY score. Can you check the R code actually computes them correctly, not just that the functions are present?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "im a reviewer for the protein science tools issue. the submission is a proteomics dashboard with a public R backend. can you set up my review folder and start going through the manuscript's claims one by one?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "review this tool paper for me \u2014 it's an 'integrated platform' that reimplements a pile of standard proteomics analyses in-house. what are the main concerns i should raise?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "I agreed to review a submission for JPR \u2014 it's a Shiny app for proteomics QC. They sent me a proof PDF and a github link to the code. where do i even start and what should i actually check?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Can you help me verify whether the authors of this bioinformatics tool paper actually implemented the methods they describe? The repo is cloned in ./submission_1/software and the manuscript md is in ./submission_1/manuscript.",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "Review my pull request that refactors the normalization module in our R package \u2014 check the diff for bugs and style before I merge.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Check the software/data-management plan in my CIHR grant proposal for reproducibility weaknesses a panel might flag.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Write a point-by-point rebuttal responding to the three reviewers of our tool paper; reviewer 2 is asking for benchmarking we think is out of scope.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Summarize this proteomics tool paper (attached PDF) for our lab journal club next Tuesday \u2014 one slide of pros and cons.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Help me write the Methods section for my own proteomics tool paper \u2014 we're submitting to MCP next week and I need to describe our normalization and imputation steps.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "Draft a GitHub issue reporting that the KNN imputation in ProteoAnalystR returns a transposed matrix on a features-by-samples input.",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ]
+    }
+  ]
+}

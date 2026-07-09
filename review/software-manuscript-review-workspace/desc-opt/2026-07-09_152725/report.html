@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>software-manuscript-review — Skill Description Optimization</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lora', Georgia, serif;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            background: #faf9f5;
+            color: #141413;
+        }
+        h1 { font-family: 'Poppins', sans-serif; color: #141413; }
+        .explainer {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #e8e6dc;
+            color: #b0aea5;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        .summary {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #e8e6dc;
+        }
+        .summary p { margin: 5px 0; }
+        .best { color: #788c5d; font-weight: bold; }
+        .table-container {
+            overflow-x: auto;
+            width: 100%;
+        }
+        table {
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid #e8e6dc;
+            border-radius: 6px;
+            font-size: 12px;
+            min-width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #e8e6dc;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        th {
+            font-family: 'Poppins', sans-serif;
+            background: #141413;
+            color: #faf9f5;
+            font-weight: 500;
+        }
+        th.test-col {
+            background: #6a9bcc;
+        }
+        th.query-col { min-width: 200px; }
+        td.description {
+            font-family: monospace;
+            font-size: 11px;
+            word-wrap: break-word;
+            max-width: 400px;
+        }
+        td.result {
+            text-align: center;
+            font-size: 16px;
+            min-width: 40px;
+        }
+        td.test-result {
+            background: #f0f6fc;
+        }
+        .pass { color: #788c5d; }
+        .fail { color: #c44; }
+        .rate {
+            font-size: 9px;
+            color: #b0aea5;
+            display: block;
+        }
+        tr:hover { background: #faf9f5; }
+        .score {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .score-good { background: #eef2e8; color: #788c5d; }
+        .score-ok { background: #fef3c7; color: #d97706; }
+        .score-bad { background: #fceaea; color: #c44; }
+        .train-label { color: #b0aea5; font-size: 10px; }
+        .test-label { color: #6a9bcc; font-size: 10px; font-weight: bold; }
+        .best-row { background: #f5f8f2; }
+        th.positive-col { border-bottom: 3px solid #788c5d; }
+        th.negative-col { border-bottom: 3px solid #c44; }
+        th.test-col.positive-col { border-bottom: 3px solid #788c5d; }
+        th.test-col.negative-col { border-bottom: 3px solid #c44; }
+        .legend { font-family: 'Poppins', sans-serif; display: flex; gap: 20px; margin-bottom: 10px; font-size: 13px; align-items: center; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-swatch { width: 16px; height: 16px; border-radius: 3px; display: inline-block; }
+        .swatch-positive { background: #141413; border-bottom: 3px solid #788c5d; }
+        .swatch-negative { background: #141413; border-bottom: 3px solid #c44; }
+        .swatch-test { background: #6a9bcc; }
+        .swatch-train { background: #141413; }
+    </style>
+</head>
+<body>
+    <h1>software-manuscript-review — Skill Description Optimization</h1>
+    <div class="explainer">
+        <strong>Optimizing your skill's description.</strong> This page updates automatically as Claude tests different versions of your skill's description. Each row is an iteration — a new description attempt. The columns show test queries: green checkmarks mean the skill triggered correctly (or correctly didn't trigger), red crosses mean it got it wrong. The "Train" score shows performance on queries used to improve the description; the "Test" score shows performance on held-out queries the optimizer hasn't seen. When it's done, Claude will apply the best-performing description to your skill.
+    </div>
+
+    <div class="summary">
+        <p><strong>Original:</strong> Evidence-first workflow for reviewing software manuscripts, bioinformatics/proteomics tool papers, author responses, and revision rounds. Use when asked to audit a submitted software paper, verify authors&#x27; response claims against code/manuscripts, inspect reproducibility/test/build evidence, check whether runnable example data is provided per module, verify that scientific metrics are computed correctly (not merely present), assess scope/workflow coherence, handle reviewer confidentiality and journal AI-use policy, assess scientific language for promotional or redundant text, or produce review artifacts (private verification in evaluation plus a concise human-voiced review/review_for_authors.txt and short review/mail_editor.txt).</p>
+        <p class="best"><strong>Best:</strong> Evidence-first workflow for reviewing software manuscripts, bioinformatics/proteomics tool papers, author responses, and revision rounds. Use when asked to audit a submitted software paper, verify authors&#x27; response claims against code/manuscripts, inspect reproducibility/test/build evidence, check whether runnable example data is provided per module, verify that scientific metrics are computed correctly (not merely present), assess scope/workflow coherence, handle reviewer confidentiality and journal AI-use policy, assess scientific language for promotional or redundant text, or produce review artifacts (private verification in evaluation plus a concise human-voiced review/review_for_authors.txt and short review/mail_editor.txt).</p>
+        <p><strong>Best Score:</strong> 4/8 (test)</p>
+        <p><strong>Iterations:</strong> 3 | <strong>Train:</strong> 12 | <strong>Test:</strong> 8</p>
+    </div>
+
+    <div class="legend">
+        <span style="font-weight:600">Query columns:</span>
+        <span class="legend-item"><span class="legend-swatch swatch-positive"></span> Should trigger</span>
+        <span class="legend-item"><span class="legend-swatch swatch-negative"></span> Should NOT trigger</span>
+        <span class="legend-item"><span class="legend-swatch swatch-train"></span> Train</span>
+        <span class="legend-item"><span class="legend-swatch swatch-test"></span> Test</span>
+    </div>
+
+    <div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Iter</th>
+                <th>Train</th>
+                <th>Test</th>
+                <th class="query-col">Description</th>
+                <th class="positive-col">I need to write the confidential note to the editor and the comments to the authors for this software submission. My verified findings are in evaluation/. Keep the author comments short.</th>
+                <th class="positive-col">The manuscript describes an isoelectric-point calculation and a GRAVY score. Can you check the R code actually computes them correctly, not just that the functions are present?</th>
+                <th class="positive-col">im a reviewer for the protein science tools issue. the submission is a proteomics dashboard with a public R backend. can you set up my review folder and start going through the manuscript&#x27;s claims one by one?</th>
+                <th class="positive-col">review this tool paper for me — it&#x27;s an &#x27;integrated platform&#x27; that reimplements a pile of standard proteomics analyses in-house. what are the main concerns i should raise?</th>
+                <th class="positive-col">I agreed to review a submission for JPR — it&#x27;s a Shiny app for proteomics QC. They sent me a proof PDF and a github link to the code. where do i even start and what should i actually check?</th>
+                <th class="positive-col">Can you help me verify whether the authors of this bioinformatics tool paper actually implemented the methods they describe? The repo is cloned in ./submission_1/software and the manuscript md is in ./submission_1/manuscript.</th>
+                <th class="negative-col">Check the software/data-management plan in my CIHR grant proposal for reproducibility weaknesses a panel might flag.</th>
+                <th class="negative-col">Review my pull request that refactors the normalization module in our R package — check the diff for bugs and style before I merge.</th>
+                <th class="negative-col">Write a point-by-point rebuttal responding to the three reviewers of our tool paper; reviewer 2 is asking for benchmarking we think is out of scope.</th>
+                <th class="negative-col">Summarize this proteomics tool paper (attached PDF) for our lab journal club next Tuesday — one slide of pros and cons.</th>
+                <th class="negative-col">Draft a GitHub issue reporting that the KNN imputation in ProteoAnalystR returns a transposed matrix on a features-by-samples input.</th>
+                <th class="negative-col">Help me write the Methods section for my own proteomics tool paper — we&#x27;re submitting to MCP next week and I need to describe our normalization and imputation steps.</th>
+                <th class="test-col positive-col">Help me audit the reproducibility claims of this web-tool manuscript: whether the linked R package installs, whether it&#x27;s a real package, and whether a web analysis can be replayed locally.</th>
+                <th class="test-col positive-col">peer review for Bioinformatics: the manuscript claims the tool reproduces all the figures but I can&#x27;t find any example data or a way to rerun their analysis. how do I frame that as a reviewer?</th>
+                <th class="test-col positive-col">I&#x27;m on round 2 of a review. The authors&#x27; response letter says they added unit tests and fixed the normalization bug — check those claims against the updated code before I sign off.</th>
+                <th class="test-col negative-col">Can you improve the description field of my software-manuscript-review skill so it triggers more reliably, and run the eval loop on it?</th>
+                <th class="test-col positive-col">Does this paper&#x27;s Supplementary Table comparing their tool against Perseus and MSstats look fair to you, or is it stacked in their favour? I&#x27;m reviewing it.</th>
+                <th class="test-col negative-col">Install this R package from its GitHub repo and run its example workflow on my proteinGroups.txt so I can see the output.</th>
+                <th class="test-col negative-col">Benchmark prolfqua against MSstats on this DIA dataset in ~/data/dia_report.tsv and tell me which gives better FDR control.</th>
+                <th class="test-col negative-col">I&#x27;m reviewing a wet-lab manuscript about palmitate effects on human islets — no software or tool involved, just proteomics results. Help me assess whether the statistics support their conclusions.</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="best-row">
+                <td>1</td>
+                <td><span class="score score-ok">18/36</span></td>
+                <td><span class="score score-ok">12/24</span></td>
+                <td class="description">Evidence-first workflow for reviewing software manuscripts, bioinformatics/proteomics tool papers, author responses, and revision rounds. Use when asked to audit a submitted software paper, verify authors&#x27; response claims against code/manuscripts, inspect reproducibility/test/build evidence, check whether runnable example data is provided per module, verify that scientific metrics are computed correctly (not merely present), assess scope/workflow coherence, handle reviewer confidentiality and journal AI-use policy, assess scientific language for promotional or redundant text, or produce review artifacts (private verification in evaluation plus a concise human-voiced review/review_for_authors.txt and short review/mail_editor.txt).</td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+            </tr>
+            <tr class="">
+                <td>2</td>
+                <td><span class="score score-ok">18/36</span></td>
+                <td><span class="score score-ok">12/24</span></td>
+                <td class="description">Use when acting as the assigned peer reviewer of a submitted software or bioinformatics/proteomics tool paper — a manuscript plus its code repository that must be audited before recommending accept/revise/reject. Triggers on requests to set up a review folder, go through a manuscript&#x27;s claims one by one, verify whether the authors actually implemented the methods they describe, check that named scientific metrics are computed correctly (not merely present), inspect reproducibility/tests/build/runnable example data, judge whether an &quot;integrated platform&quot; reuses and cites established tools instead of silently reimplementing them, handle reviewer confidentiality and journal AI-use policy, or draft the two reviewer deliverables (a short confidential note to the editor plus concise comments to the authors, often from verified findings in an evaluation folder). This is for reviewing someone else&#x27;s submission — not authoring, rebutting, summarizing, or filing bugs on your own paper or code.</td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+            </tr>
+            <tr class="">
+                <td>3</td>
+                <td><span class="score score-ok">18/36</span></td>
+                <td><span class="score score-ok">12/24</span></td>
+                <td class="description">Use when the user is peer-reviewing someone else&#x27;s submitted paper about a research software tool — often a bioinformatics or proteomics package, Shiny app, or &quot;integrated platform&quot; — where a manuscript comes with a code repository to audit before recommending accept, revise, or reject. Applies whether the reviewer is starting out (&quot;I agreed to review this for a journal — where do I start? what should I check?&quot;, &quot;set up my review folder&quot;), walking the manuscript&#x27;s claims one by one to verify the authors actually implemented the described methods and computed named metrics correctly (not just present), auditing reproducibility/tests/builds/example data, judging whether established tools are reused and cited rather than silently reimplemented, handling reviewer confidentiality and journal AI policy, or drafting the deliverables (a confidential editor note plus concise author comments). Not for writing, rebutting, summarizing, or filing bugs on the user&#x27;s own paper or code.</td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+
+</body>
+</html>

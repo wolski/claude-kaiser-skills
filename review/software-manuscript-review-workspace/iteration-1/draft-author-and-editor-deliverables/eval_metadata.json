@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "draft-author-and-editor-deliverables",
+  "prompt": "Draft the comments to the authors and the confidential note to the editor for OmniProt from six verified findings; recommendation is major revision.",
+  "assertions": [
+    "Produces exactly the two skill-named files: review_for_authors.txt and mail_editor.txt",
+    "Author-facing review is concise (<=1000 words, ~750 target)",
+    "COI honored: prolfqua/prolfquapp is not cited in the author-facing review",
+    "The confidential editor note states the recommendation (major revision) with a short rationale",
+    "The formal recommendation is kept OUT of the author-facing comments (confidentiality convention)",
+    "Attribution concern names reference method tools/citations feature by feature (VSN, quantile, KNN, BPCA, ORA)",
+    "Bugs/install-failures are folded as evidence under reproducibility, with no internal QA bug-list in the author review"
+  ]
+}

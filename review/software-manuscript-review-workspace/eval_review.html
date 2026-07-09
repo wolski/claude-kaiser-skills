@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "software-manuscript-review", "runs": [{"id": "review-framing-and-scope-with_skill", "prompt": "How should I frame my first-round review of the OmniProt integrated-platform manuscript; what are the main concerns; what goes to authors vs editor vs private?", "eval_id": 0, "outputs": [{"name": "mail_editor.txt", "type": "text", "content": "Recommendation: Major revision with re-review.\n\nOmniProt targets a genuine need -- a single environment that carries MaxQuant, FragPipe,\nand DIA-NN outputs through QC, normalization, imputation, differential expression, and\nenrichment -- and integration of this kind is a legitimate contribution. However, the\npaper's central claims are not currently supported. The \"open-source OmniProtR package\n... for full transparency and reproducibility\" is in practice a folder of R scripts with\nno DESCRIPTION/NAMESPACE that fails to install (R CMD INSTALL), contains hard-coded\nabsolute paths, and ships no tests or example data, so no result can be reproduced by an\nindependent reader. The manuscript also uses established methods (VSN, quantile\nnormalization, KNN and Bayesian PCA imputation, the moderated t-test, and GO/KEGG\nenrichment) without primary citations or any validation, and the methods are\nunderspecified (test and background details, FDR, imputation and normalization\nparameters), so correctness cannot be assessed. These are reproducibility- and\ncorrectness-level issues that require re-evaluation after revision rather than editorial\npolish; I therefore recommend major revision with re-review.\n\nNote: I have a potential conflict of interest, as I am an author of one of the\nestablished differential-expression frameworks (prolfqua) relevant to this manuscript. I\nhave framed the attribution point around the general class of established tools rather\nthan any single package.\n"}, {"name": "review-framing-and-plan.md", "type": "text", "content": "# OmniProt review: framing, main concerns, and what goes where\n\nFirst-round review of an \"integrated proteomics platform\" manuscript (OmniProt) plus\nits released code (OmniProtR). This is the reviewer-side planning/answer to four\nquestions: (1) the main concerns, (2) how to frame the review, (3) what goes to the\nauthors vs. the editor, and (4) what to keep private. It is written from the manuscript\nexcerpts and the facts you observed in the clone. No file:line evidence is invented.\n\n---\n\n## 0. Read this first: confidentiality and AI use\n\nThe manuscript and your review are confidential. Before you use any AI assistance on\nthis manuscript, check the target journal/publisher policy on AI in peer review. Many\npublishers treat pasting the manuscript, the code, or the review into a generative-AI\nservice as a confidentiality breach and an ethics violation, and some rescind reviews\nfound to contain AI-generated text. Two consequences:\n\n- Any AI-assisted analysis (including this planning document) is **private working\n  material only**. The review you submit must be your own expert judgment, in your own\n  voice, verified point by point.\n- If confidentiality has already been touched, or the policy is unclear, that is your\n  professional call to make before submitting anything.\n\n**Conflict of interest.** You (witold@ethz.ch) are an author of prolfqua/prolfquapp,\none of the reference differential-expression frameworks relevant here. When you raise\nattribution/validation for differential expression, name the **class** of established\ntools (limma/DEqMS, MSstats, msqrob2, prolfqua) and let the authors choose. Do not\nsingle out your own package.\n\n---\n\n## 1. Main concerns (ranked)\n\nThis is an integrated-platform paper, so the governing thesis is **reuse, attribution,\nand validation of established methods, plus reproducibility** \u2014 not a hunt for internal\nbugs. Integrating many analyses into one environment is a legitimate contribution; it\ndoes not license re-coding or re-using established methods without citation and\nvalidation, and it does not lower the reproducibility bar.\n\n### Major\n\n1. **The released code does not support the \"transparency and reproducibility\" claim.**\n   The Availability statement says OmniProtR is released \"for full transparency and\n   reproducibility,\" but what is shipped is a directory of R scripts, not a package:\n   no DESCRIPTION/NAMESPACE, `R CMD INSTALL` fails, several functions hard-code\n   `/home/dev/...` absolute paths, and there are no tests and no example data. An\n   independent reader therefore cannot install, run, or reproduce anything in the paper.\n   Source availability is weaker evidence than a runnable workflow; here even\n   availability-as-installable-software is not met. Frame as the headline concern.\n   - Make it concrete with a **per-module input inventory**: QC, normalization,\n     imputation, differential expression, enrichment \u2014 and each of the three declared\n     upstream formats (MaxQuant, FragPipe, DIA-NN). None currently has runnable example\n     input. The concrete ask: install cleanly, remove hard-coded paths, ship one small\n     example dataset per supported input plus a figure-regeneration script, and add\n     tests that exercise the analytical steps (not just startup).\n\n2. **Established methods are used without attribution or validation.** No citations are\n   given for VSN, quantile normalization, KNN, Bayesian PCA, the enrichment test, or any\n   reference differential-expression tool. For an integrated platform this is the\n   central issue, handled feature by feature (see the citation map in Section 4). The\n   deeper point: for each feature, is the community package **reused** or the method\n   **re-implemented in-house**? Reimplementation carries a validation burden (justify\n   why the reference tool was not reused; show concordance against it). Because the code\n   will not run, you cannot tell which is the case \u2014 and that **unverifiability is itself\n   the finding**, not something you should resolve by debugging their scripts for them.\n\n3. **Methods are underspecified, so correctness cannot be assessed or reproduced.**\n   \"Moderated t-test\" (which implementation? design/contrasts? scale? multiple-testing\n   correction?); enrichment \"against GO and KEGG\" (which test \u2014 hypergeometric/Fisher or\n   GSEA? what background/universe? which GO namespaces? what FDR?); imputation (KNN `k`\n   and axis; BPCA components); normalization (per-sample? on log scale?). These are\n   needed both to judge correctness and to reproduce results.\n\n### Minor / scope\n\n4. **Workflow coherence.** The excerpt reads as a linear pipeline\n   (QC -> normalization -> imputation -> DE -> enrichment), which is better than a set\n   of interface-only modules \u2014 but ask for a workflow diagram and a short rationale for\n   the tool/method selection, and confirm each stage's output feeds the next.\n\n5. **Promotional language.** \"easy-to-use,\" \"comprehensive,\" \"single seamless\n   environment,\" \"full transparency and reproducibility\" are unsupported superlatives;\n   the reproducibility claim is actively contradicted by the state of the code. Ask for\n   specific, verifiable statements about supported inputs, tested workflows, and limits.\n\n6. **Input parsing robustness.** With three declared upstream formats and no example\n   data, ask whether parsing is robust to version differences and fails loudly rather\n   than silently dropping columns/files (a real data-integrity risk for a QC-bearing\n   tool).\n\n---\n\n## 2. How to frame the review\n\n- **Two-part structure:** (1) manuscript and method claims (attribution, method\n  specification, language, scope); (2) software/reproducibility (installability, example\n  data, tests, hard-coded paths).\n- **Thesis-first, not a bug list.** Lead with reuse/attribution/validation and\n  reproducibility. The install failure, missing package metadata, hard-coded paths, and\n  absence of data/tests are legitimate high-level reproducibility observations that an\n  ordinary reviewer makes when trying to run released software \u2014 fold them **under** the\n  reproducibility concern. Do **not** turn this into an internal QA report of individual\n  code bugs; that would contradict the \"not reproducible / not a real package\" thesis and\n  signal you did the authors' testing for them.\n- **Compression gate.** Three major concerns (reproducibility, attribution/validation,\n  method specification) plus a few short minors. Keep it concise and in your own voice\n  (~750 words), not a five-page audit.\n- **Open with the real contribution.** The integration goal is worthwhile; say so in two\n  or three non-promotional sentences before the critique.\n- **Ask for exact fixes**, not vague \"improve documentation\": installable package,\n  runnable example per input, primary-method citations, validation-vs-reference where\n  re-implemented, specific parameters/thresholds/background sets.\n\n---\n\n## 3. What goes to the authors vs. the editor vs. private\n\n### To the authors (`review_for_authors.txt`)\nThe publication-relevant concerns in your own voice, Major/Minor, framed as concrete\nrequests: the reproducibility/installability observations (no package metadata, install\nfails, hard-coded paths, no tests, no example data), the feature-by-feature attribution\nand validation ask, the missing method specifications, and the short scope/language/\nparsing minors. These are in scope: a reviewer legitimately attempts to install and run\nreleased software and reports that it does not install or run.\n\n### To the editor (`mail_editor.txt`)\nA short confidential recommendation \u2014 **major revision with re-review** \u2014 with a 2\u20134\nsentence rationale: real integration contribution, but the transparency/reproducibility\nclaim is unsupported (not installable, no data, no tests), established methods are used\nwithout attribution or validation, and methods are underspecified, so correctness cannot\nbe assessed. These are correctness/reproducibility issues requiring re-evaluation after\nrevision, not editorial polish.\n\n### Keep private (reviewer-side `evaluation/` only \u2014 never submitted)\n- This AI-assisted planning document and any AI-assisted prose.\n- Command transcripts and file:line evidence \u2014 the exact `R CMD INSTALL` failure output,\n  `grep`/`rg` hits for `/home/dev/...`, directory listings.\n- The per-module input inventory table and the claim-verification table (PASS/PARTIAL/\n  FAIL/NOT FOUND).\n- Any deeper audit or synthetic-data / benchmarking experiments you run to gain\n  confidence: valuable for your own certainty, but out of scope for the submitted review\n  (cite only as private evidence that informed your judgment).\n- A `Handoff` note listing what to submit vs. keep private.\n\nKeep `evaluation/` (private) and `review/` (the two submittable files) physically\nseparate. `review/` contains exactly `review_for_authors.txt` and `mail_editor.txt` \u2014\nno TODOs, logs, tables, or drafts.\n\n---\n\n## 4. Feature-by-feature citation/validation map (private working note)\n\nUse this to write concern #2; do not paste the table into the author review \u2014 turn it\ninto a couple of sentences there.\n\n| Feature (as stated) | Method / primary citation to request | Package | If re-implemented |\n| --- | --- | --- | --- |\n| Quantile normalization | Bolstad et al., 2003 | `preprocessCore` | justify + validate vs. reference |\n| VSN | Huber et al., 2002 | `vsn` | justify + validate |\n| KNN imputation | Troyanskaya et al., 2001 | `impute` | justify + validate |\n| Bayesian PCA imputation | Oba et al., 2003; Stacklies et al., 2007 | `pcaMethods` | justify + validate |\n| Moderated t-test (DE) | Smyth, 2004 (limma); DEqMS (Zhu et al., 2020) | `limma` | position vs. class: limma/DEqMS, MSstats, msqrob2, prolfqua (COI: name the class) |\n| Enrichment test | hypergeometric/Fisher, e.g. clusterProfiler (Wu et al., 2021); or topGO/goseq | `clusterProfiler` | disclose background/universe + FDR |\n| GO database | Ashburner et al., 2000; GO Consortium | \u2014 | cite database separately from the test |\n| KEGG database | Kanehisa & Goto, 2000 | \u2014 | cite database separately from the test |\n\nNote the distinction the authors likely conflate: for enrichment, the **gene-set\ndatabases** (GO, KEGG) and the **statistical test/implementation** are separate citations;\nnaming only the databases leaves the test unattributed and the background set undisclosed.\n"}, {"name": "review_for_authors.txt", "type": "text", "content": "Review of OmniProt (Manuscript ID: [ID])\n\nSummary\n\nOmniProt addresses a real need: a single environment that carries MaxQuant, FragPipe,\nand DIA-NN outputs through a standard downstream workflow (QC, normalization, imputation,\ndifferential expression, and functional enrichment). Lowering the barrier to a\nconsistent, end-to-end analysis across these upstream tools is a legitimate and useful\ncontribution. My concerns are not with the goal but with whether the manuscript, as it\nstands, supports its central claims of transparency, reproducibility, and methodological\nsoundness. The three major points below are, in my view, blocking for publication.\n\nMajor concerns\n\n1. The released software does not support the transparency/reproducibility claim.\nThe Availability section states that OmniProtR is released \"for full transparency and\nreproducibility,\" but the repository as provided is a directory of R scripts rather than\nan installable package: it has no DESCRIPTION or NAMESPACE, and R CMD INSTALL fails.\nSeveral functions contain hard-coded absolute paths (/home/dev/...), so the code cannot\nrun outside the authors' machine, and there are no automated tests and no example data.\nAs a result, an independent reader cannot install OmniProtR, run it, or reproduce any\nresult in the manuscript. Please (a) package the code so it installs cleanly\n(DESCRIPTION/NAMESPACE, declared dependencies, no hard-coded paths); (b) include a small\nrunnable example dataset for each supported input (MaxQuant, FragPipe, DIA-NN) together\nwith a script that regenerates the main figures end to end; and (c) add tests that\nexercise the core analytical steps, not just application startup. Source availability on\nits own is weaker evidence than a workflow a reader can actually run.\n\n2. Established methods are used without attribution or validation.\nEach analytical step relies on a well-established method, but the manuscript gives no\nprimary citation for VSN, quantile normalization, KNN or Bayesian PCA imputation, the\nenrichment test, or any reference differential-expression framework. For an integrated\nplatform this is the central issue: integration is a valid contribution, but it does not\nlicense re-using or re-implementing established methods without crediting and validating\nthem. Please cite the methods you use, feature by feature, for example: quantile\nnormalization (Bolstad et al., 2003; preprocessCore), VSN (Huber et al., 2002; vsn), KNN\nimputation (Troyanskaya et al., 2001; impute), Bayesian PCA (Oba et al., 2003;\npcaMethods), the moderated t-test (Smyth, 2004; limma), and the enrichment test itself\n(e.g. a hypergeometric test as implemented in clusterProfiler, Wu et al., 2021) as\ndistinct from the gene-set databases GO (Ashburner et al., 2000) and KEGG (Kanehisa &\nGoto, 2000). For differential expression, please also position OmniProt relative to the\nestablished proteomics DEA frameworks (limma/DEqMS, MSstats, msqrob2, prolfqua). Where you\nwrap the community package, cite it; where you re-implement a method in-house, state why\nthe reference tool was not reused and validate your implementation against it (for\nexample, concordance on a shared dataset). Because the code cannot currently be run, the\ncorrectness of these steps cannot be verified.\n\n3. The methods are underspecified, so correctness and reproducibility cannot be assessed.\nKey details are missing. For differential expression, please state the implementation\nused, the experimental design/contrasts, the scale on which the test is applied, and the\nmultiple-testing correction. For enrichment, please state the exact test, the\nbackground/universe, the GO namespaces considered, and the FDR method. For imputation,\ngive the KNN k and the axis used and the Bayesian PCA settings; for normalization, state\nwhether it is applied per sample and on the log scale. These are needed both to judge\ncorrectness and to reproduce results.\n\nMinor concerns\n\n- Please add a workflow diagram and a brief rationale for the choice of methods, and\n  confirm that each stage's output feeds the next (QC -> normalization -> imputation ->\n  differential expression -> enrichment), so the platform reads as a coherent pipeline\n  rather than a set of independent utilities.\n\n- Please replace promotional language (\"easy-to-use,\" \"comprehensive,\" \"single seamless\n  environment,\" \"full transparency and reproducibility\") with specific, verifiable\n  statements about the supported inputs, the tested workflows, and the limitations. The\n  reproducibility claim in particular is currently contradicted by the state of the\n  released code.\n\n- Please confirm that parsing of MaxQuant, FragPipe, and DIA-NN outputs is robust to\n  version differences and fails with a clear message rather than silently dropping\n  columns or files.\n\nOverall\n\nThe integration goal is worthwhile, but in its current form the manuscript's central\nclaims of transparency, reproducibility, and methodological rigor are not supported by\nthe released software or the methods text. I recommend major revision, with re-review\nonce the package installs and runs on example data, the methods are fully specified, and\nthe established methods are properly attributed and, where re-implemented, validated\nagainst their reference implementations.\n"}], "grading": {"expectations": [{"text": "Separates what goes to the authors, to the editor, and what is kept private", "passed": true, "evidence": "Section 3 explicitly splits To the authors / To the editor / Keep private."}, {"text": "Frames reuse/attribution/validation of established methods as the governing thesis for an integrated-platform paper (not a bug hunt)", "passed": true, "evidence": "Section 1 states reuse/attribution/validation + reproducibility is the governing thesis for an integrated platform, not a bug hunt."}, {"text": "Preserves confidentiality: warns against opening GitHub issues / contacting authors via the repo, and flags the journal AI-in-review policy", "passed": true, "evidence": "Section 6 warns 'Do NOT open GitHub issues', preserve anonymity, and check the journal AI-use policy (Section 0)."}, {"text": "Applies the 'reviewer is not the authors' QA' framing (bugs as evidence for the thesis, not a debugging service)", "passed": true, "evidence": "Section 1/2 state the install failure etc. are reproducibility evidence and 'not something you should resolve by debugging their scripts'."}, {"text": "Handles COI correctly: names the class of DEA tools and does not cite the reviewer's own package in the submittable text", "passed": false, "evidence": "Flagged the COI up front and named the class, BUT the drafted review_for_authors.txt lists 'prolfqua' inside the DEA class in the SUBMITTED text (prolfqua count=1) - the reviewer's own package should not be cited in the submitted review at all."}, {"text": "Recommends a concise, thesis-first, human-voiced review (~750 words) rather than a five-page audit", "passed": true, "evidence": "Recommends thesis-first, ~750-word review; its own drafted review is 759 words."}], "summary": {"passed": 5, "failed": 1, "total": 6, "pass_rate": 0.833}}}, {"id": "review-framing-and-scope-without_skill", "prompt": "How should I frame my first-round review of the OmniProt integrated-platform manuscript; what are the main concerns; what goes to authors vs editor vs private?", "eval_id": 0, "outputs": [{"name": "omniprot_review_guidance.md", "type": "text", "content": "# Peer Review Guidance: \"OmniProt\" (first round)\n\nThis is advisory guidance for framing your review. It works only from the manuscript\nexcerpts you supplied and the facts you verified by cloning `OmniProtR`. It does not\ninvent any additional evidence about the tool.\n\n---\n\n## 1. Bottom line / stance\n\nThe concept (a single environment carrying MaxQuant / FragPipe / DIA-NN outputs through\nQC \u2192 normalization \u2192 imputation \u2192 differential expression \u2192 enrichment) is reasonable and\npotentially useful. The problem is a large gap between the paper's headline claims and what\nthe released artifact actually supports:\n\n- The manuscript claims the code is released \"as the open-source OmniProtR **package** ...\n  for **full transparency and reproducibility**.\"\n- What you found: a folder of R scripts with **no DESCRIPTION/NAMESPACE**, **`R CMD INSTALL`\n  fails**, **no tests**, **no example data**, and **hard-coded `/home/dev/...` paths**.\n\nSo the paper's two core promises \u2014 that it is an installable open-source package and that it\ndelivers reproducibility \u2014 are **not substantiated by the thing it points to**. On top of that,\nnone of the borrowed statistical methods are cited, and there is no benchmarking against any\nreference tool. Because the code does not install and ships no runnable example, you cannot\nverify that any of the numbers it produces are correct.\n\nThat combination \u2014 unsubstantiated central claims plus no way to verify correctness \u2014 is what\nshould drive your recommendation and your framing. Frame it as **major revision** (or\nreject-and-resubmit, depending on your journal's process; see \u00a75 and the editor note in \u00a77).\nThe deficiencies are serious but, in principle, fixable, so a constructive \"here is exactly\nwhat would make this publishable\" tone is appropriate for a first round.\n\n---\n\n## 2. Main concerns to raise (prioritized)\n\n### Major (blocking) concerns\n\n**M1. \"Open-source package\" and \"reproducibility\" claims are contradicted by the artifact.**\nThis is the headline issue and the strongest because it is directly verifiable.\n- It is not an R package: no `DESCRIPTION`, no `NAMESPACE`. Calling it a \"package\" is inaccurate.\n- `R CMD INSTALL` fails \u2014 a reader cannot install it as the paper implies.\n- Hard-coded `/home/dev/...` paths mean it will not run on any machine but the developers'.\n  This directly refutes \"reproducibility\" and portability; it suggests the code was never\n  exercised outside the authors' environment.\n- \"Open-source\" also requires an explicit license; note whether a LICENSE file is present\n  (without one, the default is all-rights-reserved, i.e. not actually open source).\n\n**M2. Correctness cannot be verified, and there is no benchmarking.**\n- No tests and no example data means neither you nor any reader can confirm the statistics\n  are computed correctly. For a tool paper this is the central obligation.\n- No comparison against an established reference DE tool (e.g. limma, MSstats, DEqMS, proDA)\n  or an established integrated platform. The field is crowded (Perseus, FragPipe-Analyst,\n  LFQ-Analyst, DEP, amica, prolfqua, ...); the paper needs to show its outputs are correct\n  and to justify what it adds.\n\n**M3. No citations / attribution for the methods, and methods are under-specified.**\nEvery listed method is an established, published algorithm, yet none is cited. The authors\nshould attribute at minimum:\n- VSN (e.g. Huber et al., 2002)\n- quantile normalization\n- KNN imputation (e.g. Troyanskaya et al., 2001)\n- Bayesian PCA imputation (e.g. Oba et al., 2003 / the `pcaMethods` implementation)\n- the moderated t-test (almost certainly limma; Smyth, 2004) \u2014 the paper should say so and\n  cite it, not just call it \"a moderated t-test\"\n- the enrichment test \u2014 the paper does not even name the test (hypergeometric / Fisher's\n  exact? GSEA?), and gives no version/source for GO or KEGG annotations.\n\n(You can flag that these references are missing; the specific citations above are the\ncanonical ones the authors should supply and you can verify.)\n\n**M4. Statistical appropriateness for proteomics missingness.**\nKNN and Bayesian PCA are designed for missing-at-random data. Proteomics missingness is\nfrequently non-random / left-censored (below detection limit, i.e. MNAR). Applying\nMAR-oriented imputation to MNAR data can bias downstream differential expression. The paper\nshould state which missingness assumption it targets, justify the imputation choices, and\naddress the interaction between imputation and the moderated t-test. Related: the order of\noperations (transform \u2192 normalize \u2192 impute) and multiple-testing correction for both DE and\nenrichment are not described.\n\n### Minor / clarification concerns\n\n**m5. Naming and scope of the claim.** Clarify the relationship between the \"OmniProt\" web\nplatform and the \"OmniProtR\" code. The \"single seamless environment\" claim describes the web\napp; the reproducibility claim rests on OmniProtR. If OmniProtR is the backend, its failure to\ninstall breaks the reproducibility bridge. State clearly what a reader can actually reproduce.\n(Also note in your review whether you were able to access/test the web platform itself or only\nthe code \u2014 be precise about what you did and did not evaluate.)\n\n**m6. Guidance on option choices.** The pipeline offers multiple transforms, two imputation\nmethods, etc. Are there defaults? Is there guidance? Unlimited free choice invites\n\"researcher degrees of freedom\" and non-reproducible analyses.\n\n**m7. Versioning / archival.** Recommend a versioned, citable release (e.g. a tagged release\nwith a Zenodo DOI), pinned dependencies, and stated system requirements, so a specific paper\nresult maps to a specific software state.\n\n**m8. GO/KEGG specifics.** Which GO aspects (BP/MF/CC)? Which annotation source and release?\nKEGG has licensing constraints for programmatic/bulk use that should be acknowledged.\n\n---\n\n## 3. How to frame the review\n\n- Lead with the concept's merit, then state the central gap plainly: the released artifact\n  does not support the paper's \"installable open-source package\" and \"reproducibility\" claims,\n  and correctness cannot currently be verified.\n- Keep every observation **factual and reproducible**. Report exactly what you did and saw:\n  \"I cloned the repository; it contains R scripts but no DESCRIPTION or NAMESPACE; `R CMD\n  INSTALL` fails; there are no tests or example data; several functions reference hard-coded\n  `/home/dev/...` paths.\" Facts, not accusations of motive.\n- Make each concern **actionable**: pair it with what a satisfactory revision would provide.\n- Be constructive and specific rather than dismissive \u2014 this is a first round and the issues\n  are addressable.\n- Distinguish what you evaluated (the released code) from what you could not (e.g. the live\n  web platform, if you had no access).\n\n---\n\n## 4. What goes TO THE AUTHORS (the review report)\n\nEverything substantive and actionable. Suggested content:\n\n1. A one-paragraph summary: the goal is worthwhile, but the released code does not currently\n   support the paper's availability/reproducibility claims and its correctness cannot be\n   assessed; substantial revision is needed.\n2. The factual findings about `OmniProtR` (M1): not a package, install fails, no tests, no\n   example data, hard-coded paths, license status.\n3. Requests to make it a real, installable package: add DESCRIPTION/NAMESPACE, remove\n   hard-coded paths, pin dependencies and state system requirements, add a LICENSE, and\n   provide a tagged/archived release.\n4. Request for **runnable example data for each supported input** (MaxQuant, FragPipe,\n   DIA-NN) plus a vignette/tutorial that runs the full pipeline end-to-end, so the \"single\n   seamless environment\" claim can be demonstrated and reproduced.\n5. Request for **tests** covering the statistical steps, and for **benchmarking** against at\n   least one established DE tool / platform, with agreement (or explained differences) shown.\n6. Request for **citations** for VSN, quantile normalization, KNN, Bayesian PCA, the moderated\n   t-test (name the implementation), and the enrichment test; and for method specification\n   (enrichment test type, background/universe, multiple-testing correction, GO aspects, GO/KEGG\n   versions).\n7. The **MNAR vs MAR** imputation concern (M4) and the order-of-operations / correction points.\n8. The minor items (m5\u2013m8).\n\nDo **not** put your accept/reject recommendation in the author-facing text \u2014 by convention\nthat goes only to the editor.\n\n---\n\n## 5. What goes TO THE EDITOR (confidential comments)\n\n1. Your **recommendation** and its rationale. Given that the artifact is non-functional and\n   the two central claims are unsubstantiated, state clearly which category you are choosing:\n   - \"Major revision\" if your journal supports a substantive re-review and you judge the work\n     salvageable; or\n   - \"Reject / reject-and-resubmit\" if your journal treats \"reproducible and installable at\n     submission\" as a bar the paper must clear to enter review.\n   Let the editor apply the journal's norms; give them the facts to decide.\n2. A candid severity note: the statement that the code is released \"as the open-source\n   OmniProtR package ... for full transparency and reproducibility\" is **not currently\n   accurate** \u2014 this is a claims-integrity matter the editor should weigh, not merely a\n   documentation gap.\n3. That **correctness could not be verified** at all (no tests, no runnable example, no\n   benchmark), so the paper's core scientific reliability is presently unestablished.\n4. Any **novelty/overlap** concern relative to the many existing integrated proteomics tools,\n   if you think it bears on the decision.\n5. Scope/competence caveats: what you did and did not (or could not) evaluate \u2014 e.g. whether\n   you had access to the live web platform, and any part of the statistics outside your\n   expertise.\n6. Any conflict of interest.\n\n---\n\n## 6. What to KEEP PRIVATE (do not put in the review, do not act on)\n\n- **Your identity** \u2014 maintain reviewer anonymity per the journal's model. If it is\n  double-blind, do not attempt to deanonymize the authors.\n- **Confidentiality of the manuscript and code** \u2014 treat both as privileged. Do not\n  redistribute, do not reuse the ideas/data for your own work before publication, and do not\n  share with colleagues except as the journal's policy permits (and disclose to the editor if\n  you consult anyone).\n- **Do NOT open GitHub issues or contact the authors through the public repo.** This is a real\n  temptation here because there is a public repository, but filing an issue or a PR would break\n  blinding and confidentiality. Keep every observation inside the review that goes through the\n  editor.\n- **AI-assistance policy** \u2014 if you use any AI tool to help draft or check the review, follow\n  the journal's peer-review AI policy. Many journals prohibit uploading manuscripts or\n  unpublished code to external AI services for confidentiality reasons, and some require\n  disclosure. Handle this before pasting any manuscript/code content anywhere.\n- **Tone / candor calibration** \u2014 a frank assessment of readiness is fine in the confidential\n  editor note, but keep it professional; avoid speculation about the authors' competence or\n  motives in either channel.\n\n---\n\n## 7. Optional: ready-to-adapt draft language\n\n**Opening (to authors):**\n> OmniProt addresses a genuine need \u2014 a single environment spanning QC, normalization,\n> imputation, differential expression, and enrichment across MaxQuant, FragPipe, and DIA-NN\n> outputs. However, I was unable to reconcile the paper's availability and reproducibility\n> claims with the released code, and I could not verify the correctness of the analyses. I\n> therefore see substantial issues that would need to be resolved before the work is suitable\n> for publication; my specific comments follow.\n\n**Findings on the released code (to authors):**\n> The manuscript states the analysis code is released \"as the open-source OmniProtR package\n> ... for full transparency and reproducibility.\" On cloning the repository I found a\n> collection of R scripts without a DESCRIPTION or NAMESPACE; `R CMD INSTALL` fails; there are\n> no tests and no example data; and several functions reference hard-coded `/home/dev/...`\n> paths. In its current state it is not an installable package and cannot be run by a reader,\n> so the transparency/reproducibility claim is not yet met. To support the claim, please\n> [package it properly / remove hard-coded paths / add a license / provide runnable example\n> data per supported input / add tests and a reproducible vignette].\n\n**Confidential note (to editor):**\n> My recommendation is [major revision / reject-and-resubmit]. The paper's central claims \u2014\n> that the code is an installable open-source package and that it provides full reproducibility\n> \u2014 are not supported by the released artifact, which does not install, ships no tests or\n> example data, and contains hard-coded developer paths. Consequently I could not verify that\n> any of the tool's outputs are correct, and there is no benchmarking against an established\n> tool. I regard the reproducibility statement as currently inaccurate rather than merely\n> incomplete. The concept is worthwhile and the problems are in principle fixable, which is why\n> I lean toward [chosen category], but the burden is on the authors to demonstrate a working,\n> verifiable pipeline before this can be assessed on its scientific merits.\n"}], "grading": {"expectations": [{"text": "Separates what goes to the authors, to the editor, and what is kept private", "passed": true, "evidence": "Sections 4/5/6 separate authors / editor / keep-private thoroughly."}, {"text": "Frames reuse/attribution/validation of established methods as the governing thesis for an integrated-platform paper (not a bug hunt)", "passed": false, "evidence": "Lists concerns with reproducibility as M1 and attribution as M3; does not frame reuse/attribution/validation as the governing thesis for an integrated platform."}, {"text": "Preserves confidentiality: warns against opening GitHub issues / contacting authors via the repo, and flags the journal AI-in-review policy", "passed": true, "evidence": "Section 6 says 'Do NOT open GitHub issues' and covers the AI-assistance policy."}, {"text": "Applies the 'reviewer is not the authors' QA' framing (bugs as evidence for the thesis, not a debugging service)", "passed": false, "evidence": "No 'reviewer is not the authors' QA' framing; treats findings as concerns to raise, not evidence-for-a-thesis."}, {"text": "Handles COI correctly: names the class of DEA tools and does not cite the reviewer's own package in the submittable text", "passed": false, "evidence": "Suggests benchmarking against 'limma, MSstats, DEqMS, proDA' and lists prolfqua among existing tools; no COI awareness."}, {"text": "Recommends a concise, thesis-first, human-voiced review (~750 words) rather than a five-page audit", "passed": false, "evidence": "Very long multi-section guidance doc; no conciseness/word-target guidance."}], "summary": {"passed": 2, "failed": 4, "total": 6, "pass_rate": 0.333}}}, {"id": "draft-author-and-editor-deliverables-with_skill", "prompt": "Draft the comments to the authors and the confidential note to the editor for OmniProt from six verified findings; recommendation is major revision.", "eval_id": 1, "outputs": [{"name": "mail_editor.txt", "type": "text", "content": "Recommendation: Major revision, with re-review.\n\nOmniProt integrates MaxQuant, FragPipe, and DIA-NN outputs through a single\ndownstream workflow (QC, normalization, imputation, differential expression,\nenrichment) in one accessible web environment, which is a genuinely useful goal.\nHowever, the submission does not support its transparency and reproducibility\nclaims: the \"open-source OmniProtR package\" is a folder of scripts that does not\ninstall, has no tests, and contains hard-coded developer paths, and with no\nexample data and no figure-regeneration recipe, none of the manuscript's\nanalyses can be reproduced. Compounding this, the core methods (VSN, KNN,\nBayesian PCA, the enrichment test, and the DEA model) are re-implemented\nin-house, cited only to the platform, and not validated against the established\nreference tools, so their correctness is currently unverifiable; separately, the\nenrichment test uses the whole gene-set library rather than the quantified\nproteome as background (which inflates significance and is undocumented), and the\nmain biological validation rests on an unavailable in-house dataset, making it\ncircular. These issues are correctable but go to the heart of the paper's\nclaims, which is why I recommend major revision with re-review rather than a\nlighter decision.\n\nConfidential note on potential conflict: I develop differential-expression\nsoftware in this area, so I have deliberately framed the attribution point around\nthe general class of established proteomics DEA frameworks rather than any single\npackage, including my own. Please weigh my comments with that in mind.\n"}, {"name": "review_for_authors.txt", "type": "text", "content": "Review of \"OmniProt\" (first-round review)\n\nOmniProt addresses a real and common need: taking outputs from the three most\nwidely used proteomics quantification tools (MaxQuant, FragPipe, and DIA-NN)\nthrough a single downstream workflow - QC, normalization, imputation,\ndifferential expression, and functional enrichment - in one accessible web\nenvironment. Bringing these steps together behind one interface, and releasing\nthe underlying code openly, is a worthwhile goal and the right instinct for a\ncommunity tool. My concerns are not with the ambition but with whether the\ncurrent submission supports its central claims of transparency,\nreproducibility, and methodological soundness. As it stands, several of those\nclaims cannot be verified from the submitted materials, and I recommend major\nrevision. My main concerns follow.\n\nMajor concerns\n\n1. The released code is not a reproducible, installable package, and the\nmanuscript analyses cannot be reproduced.\nThe paper presents \"OmniProtR\" as an open-source package released \"for full\ntransparency and reproducibility,\" but the repository is a collection of R\nscripts rather than an R package: it has no DESCRIPTION or NAMESPACE, it does\nnot install (R CMD INSTALL fails), it contains no tests, and several functions\ncarry hard-coded local paths (e.g. /home/dev/...). No example data are provided\nfor any module, and Figures 1-2 cite only a PRIDE accession with no processing\ndetails (search settings, filtering, parameters, or the mapping from raw files\nto the analyzed tables). An independent user therefore cannot install the code,\nrun any module, or regenerate any figure, and the web analyses cannot be\nreplayed. Please release OmniProtR as an installable package with the standard\nmetadata, remove machine-specific paths, add a test suite covering the core\nanalytical functions, provide a small runnable example dataset for each module,\nand include a scripted recipe (inputs, parameters, commands) that reproduces the\nmanuscript figures from the cited accession. Source availability on its own does\nnot establish reproducibility.\n\n2. Established methods are re-implemented in-house and under-attributed, without\nvalidation.\nVSN, KNN imputation, Bayesian PCA, the enrichment hypergeometric test, and the\ndifferential-expression model are each re-implemented within OmniProt and cited\nonly to the platform itself, not to the methods they reproduce. Integrating\nthese analyses is a legitimate contribution, but re-coding established methods\ncarries two obligations that are not met here. First, attribution: please cite\nthe primary methods and their reference implementations - variance-stabilizing\nnormalization (Huber et al., 2002; vsn), quantile normalization (Bolstad et al.,\n2003; preprocessCore), KNN imputation (Troyanskaya et al., 2001; impute),\nBayesian PCA (Oba et al., 2003; pcaMethods), over-representation via a\nhypergeometric test (e.g. as implemented in clusterProfiler), and the\nestablished, community-validated proteomics differential-expression frameworks\n(e.g. limma, MSstats, msqrob2, DEqMS). Second, validation: where a method is\nre-implemented rather than reused, please justify why the reference tool was not\nused and show the implementation is correct by benchmarking it against that\nreference. Because the code is currently neither installable nor tested (see\nconcern 1), the correctness of these re-implementations cannot be checked at\nall - which is the central problem, not a matter of a few citations.\n\n3. The default enrichment background inflates significance and is not stated.\nThe enrichment test appears to use the whole gene-set library as the background\nrather than the quantified proteome, and the manuscript does not state which\nbackground is used. Testing against the full library overstates significance,\nbecause proteins that were never quantifiable in the experiment should not be\npart of the reference set. Please use, and clearly document, the quantified\nproteome as the default background, and report the multiple-testing correction.\n\n4. The central biological validation is not independently checkable.\nCase Study 1's claim that OmniProt \"recovers known biology\" rests on a\ncomparison to the same group's earlier dataset, which is not available. As\npresented this is circular and cannot be verified by a reader. Please validate\nagainst an independent, publicly available benchmark dataset, or make the\ncomparison dataset and its full processing available.\n\nMinor concerns\n\n- The abstract and methods repeatedly use promotional terms (\"easy-to-use\",\n\"comprehensive\", \"seamless\"). These are not supported by the submitted evidence\nand read as value claims rather than description. Please replace them with\nspecific, verifiable statements about the supported inputs, the tested\nworkflows, and the current limitations.\n\nOverall\n\nThe integration goal is sound and worth pursuing, but the submission does not\nyet support its transparency, reproducibility, or methodological claims. I\nrecommend major revision, with re-review once the software is installable and\ntested, example data and a figure-regeneration recipe are provided, the\nre-implemented methods are attributed and validated against their reference\nimplementations, the enrichment background is corrected and documented, and the\nbiological validation rests on an independent dataset.\n"}], "grading": {"expectations": [{"text": "Produces exactly the two skill-named files: review_for_authors.txt and mail_editor.txt", "passed": true, "evidence": "Wrote review_for_authors.txt and mail_editor.txt (exact skill filenames)."}, {"text": "Author-facing review is concise (<=1000 words, ~750 target)", "passed": true, "evidence": "review_for_authors.txt is 755 words (on the ~750 target)."}, {"text": "COI honored: prolfqua/prolfquapp is not cited in the author-facing review", "passed": true, "evidence": "prolfqua/prolfquapp count = 0 in review_for_authors.txt; named the class limma/MSstats/msqrob2/DEqMS."}, {"text": "The confidential editor note states the recommendation (major revision) with a short rationale", "passed": true, "evidence": "mail_editor.txt states 'Major revision, with re-review' with rationale (229 words)."}, {"text": "The formal recommendation is kept OUT of the author-facing comments (confidentiality convention)", "passed": false, "evidence": "The author-facing 'Overall' states 'I recommend major revision' - the formal recommendation leaked into the author comments (skill's Output-Shape template invites this)."}, {"text": "Attribution concern names reference method tools/citations feature by feature (VSN, quantile, KNN, BPCA, ORA)", "passed": true, "evidence": "Names VSN (Huber/vsn), quantile (Bolstad/preprocessCore), KNN (Troyanskaya/impute), BPCA (Oba/pcaMethods), ORA (clusterProfiler) feature by feature."}, {"text": "Bugs/install-failures are folded as evidence under reproducibility, with no internal QA bug-list in the author review", "passed": true, "evidence": "Install failure/hard-coded paths stated once under the reproducibility concern; no file-by-file QA list."}], "summary": {"passed": 6, "failed": 1, "total": 7, "pass_rate": 0.857}}}, {"id": "draft-author-and-editor-deliverables-without_skill", "prompt": "Draft the comments to the authors and the confidential note to the editor for OmniProt from six verified findings; recommendation is major revision.", "eval_id": 1, "outputs": [{"name": "mail_editor.txt", "type": "text", "content": "Confidential note to the editor -- \"OmniProt\"\n\nRecommendation: Major revision.\n\nOmniProt addresses a genuine need (an integrated, accessible proteomics analysis\nworkflow), and I think it could become a useful contribution. However, as\nsubmitted it is not yet acceptable, for two overarching reasons: the central\nsoftware artifact is not reproducible, and the scientific validation is weak.\nThe specific blocking issues I raised with the authors are:\n\n1. Software / reproducibility. OmniProtR is described as an open-source R\n   package but is in practice a folder of scripts: no DESCRIPTION or NAMESPACE,\n   `R CMD INSTALL` fails, no tests, and hard-coded developer paths. I could not\n   replay the web analysis. For a tool paper this is the core contribution and\n   must be installable and reproducible.\n\n2. Method attribution. VSN, KNN imputation, Bayesian PCA, the hypergeometric\n   enrichment test, and the DEA model are reimplemented in-house and cited only\n   to the platform, not to the original methods or reference tools. I asked for\n   proper citation, a clear wrap-vs-reimplement statement, and concordance\n   checks against the reference implementations.\n\n3. Enrichment background. The default background appears to be the whole\n   gene-set library rather than the quantified proteome, which inflates\n   significance, and the manuscript does not state which background is used.\n   This directly affects the reported results.\n\n4. No example data for any module; Figures 1-2 cite only a PRIDE accession with\n   no processing details, so nothing can be re-run or regenerated.\n\n5. Biological validation. Case Study 1's \"recovers known biology\" claim depends\n   on the same group's earlier, unavailable dataset, making the key validation\n   circular and unverifiable.\n\nI have judged these issues as major but addressable rather than fatal, which is\nwhy I recommend major revision rather than rejection. None of them requires new\nscience; they require packaging the software properly, correcting the\nattribution and the enrichment background, and providing independent,\nreproducible validation and example data.\n\nPlease note that verifying the fixes -- particularly reproducibility, method\nconcordance, and the corrected enrichment background -- will require a second\nreview round, ideally against the revised software artifact and a point-by-point\nresponse from the authors.\n"}, {"name": "review_for_authors.txt", "type": "text", "content": "Review of \"OmniProt\" (first round)\n\nSummary\n-------\nOmniProt is presented as an integrated platform for proteomics data analysis,\ndistributed as an open-source R package (OmniProtR) together with a web\ninterface, and covering a full workflow: normalization (VSN), missing-value\nimputation (KNN and Bayesian PCA), differential expression analysis, and\nfunctional enrichment (hypergeometric test). Bringing these steps together\nbehind a single, accessible interface addresses a real need in the field, and\nthe two case studies show the intended end-to-end use.\n\nThat said, several substantial issues need to be resolved before the manuscript\ncan be considered further. They concern (1) the availability and\nreproducibility of the software that is the paper's central contribution,\n(2) attribution of the underlying methods, (3) the statistical validity of the\nenrichment analysis, (4) the strength of the biological validation, and\n(5) the absence of example data and reproducible figures. My specific comments\nfollow, ordered roughly by importance.\n\nMajor points\n------------\n\n1. Software availability and reproducibility.\nThe manuscript describes OmniProtR as an open-source R package, but in its\ncurrent state it is a folder of scripts rather than an installable package:\nthere is no DESCRIPTION or NAMESPACE file, `R CMD INSTALL` fails, there is no\ntest suite, and several scripts contain hard-coded, developer-specific file\npaths. In addition, I was not able to replay the web-based analysis. For a\nsoftware/tool paper the artifact is the primary contribution, so this needs to\nbe brought to a state where a reader can install and run it. Please:\n   a. Package OmniProtR as a proper installable R package with DESCRIPTION and\n      NAMESPACE, and confirm it passes `R CMD check` (ideally `R CMD check\n      --as-cran`).\n   b. Remove all hard-coded local paths; take inputs and output locations as\n      arguments/parameters.\n   c. Add a test suite (e.g., testthat) covering the core functions of each\n      module.\n   d. Make the web analysis reproducible, e.g., by exposing the exact inputs,\n      parameter settings, and software versions used, and by providing a\n      scripted path that reproduces the same result.\n   e. Deposit a versioned, citable release (e.g., a tagged GitHub release with\n      an archived DOI) and reference it in the manuscript.\n\n2. Attribution of the underlying methods.\nVSN, KNN imputation, Bayesian PCA, the hypergeometric enrichment test, and the\ndifferential expression model are all established methods with primary\nliterature and, in most cases, widely used reference implementations. In the\ncurrent manuscript they are reimplemented in-house and cited only to OmniProt\nitself. Please:\n   a. Cite the original method publications and the corresponding reference\n      tools/packages for each of these components.\n   b. State explicitly, for each component, whether OmniProt wraps an existing\n      implementation or reimplements the method from scratch.\n   c. Because independent reimplementations can diverge from their references,\n      demonstrate numerical concordance between the OmniProt implementation and\n      the established reference implementation on at least one dataset for each\n      reimplemented method.\n\n3. Enrichment background (statistical validity).\nThe default background (the universe) for the enrichment analysis appears to be\nthe entire gene-set library rather than the set of proteins actually quantified\nin the experiment. Using the full library as the background inflates\nsignificance, because the universe is larger and less specific than the\npopulation the proteins were actually drawn from. Furthermore, the manuscript\ndoes not state which background is used. Please:\n   a. State explicitly in the Methods which background is applied.\n   b. Use the quantified proteome (the detected/quantified background) as the\n      default, or at minimum offer it as a clearly documented option, and\n      justify the choice.\n   c. Report how the enrichment results change when the correct (quantified\n      proteome) background is used, so the impact on the reported findings is\n      transparent.\n\n4. Biological validation in Case Study 1.\nThe claim that OmniProt \"recovers known biology\" currently rests on a comparison\nto the same group's earlier dataset, which is not available. Because that\nreference is neither independent nor accessible, the validation is effectively\ncircular and cannot be checked by a reader. Please either:\n   a. Validate against an independent, publicly available benchmark or a dataset\n      with an established ground truth; or\n   b. Make the earlier dataset available, and in either case describe precisely\n      what was compared and by which metrics what constitutes \"recovering known\n      biology.\"\n\n5. Example data and reproducible figures.\nNo example data are provided for any module, and Figures 1-2 cite only a PRIDE\naccession with no processing details. This prevents readers from running the\ntool or regenerating the figures. Please:\n   a. Provide small, runnable example datasets for each module so users can\n      exercise the full workflow out of the box.\n   b. For each figure, provide the exact input data, parameter settings, and\n      the code needed to regenerate it from the cited raw data.\n\nMinor points\n------------\n\n6. Scientific language.\nThe abstract and Methods repeatedly use promotional or subjective terms such as\n\"easy-to-use\", \"comprehensive\", and \"seamless\". These are not verifiable and\nweaken an otherwise technical presentation. Please replace them with specific,\ncheckable statements, for example the concrete steps supported, the input\nformats accepted, and any benchmarked performance.\n\nI would be glad to reassess the manuscript once these points, especially the\nsoftware packaging/reproducibility (1), method attribution and concordance (2),\nthe enrichment background (3), and the validation (4), have been addressed.\n"}], "grading": {"expectations": [{"text": "Produces exactly the two skill-named files: review_for_authors.txt and mail_editor.txt", "passed": true, "evidence": "Wrote review_for_authors.txt and mail_editor.txt (matched the skill filenames despite no skill)."}, {"text": "Author-facing review is concise (<=1000 words, ~750 target)", "passed": true, "evidence": "review_for_authors.txt is 846 words (>~750 target but under the 1000 cap)."}, {"text": "COI honored: prolfqua/prolfquapp is not cited in the author-facing review", "passed": true, "evidence": "prolfqua/prolfquapp count = 0 in review_for_authors.txt."}, {"text": "The confidential editor note states the recommendation (major revision) with a short rationale", "passed": true, "evidence": "mail_editor.txt states the major-revision recommendation with rationale (342 words)."}, {"text": "The formal recommendation is kept OUT of the author-facing comments (confidentiality convention)", "passed": true, "evidence": "Author file contains no formal recommendation (count=0); baseline explicitly withheld it 'per confidentiality convention'."}, {"text": "Attribution concern names reference method tools/citations feature by feature (VSN, quantile, KNN, BPCA, ORA)", "passed": true, "evidence": "Requests primary citations for VSN, KNN, BPCA, hypergeometric test, and the DEA model, feature by feature."}, {"text": "Bugs/install-failures are folded as evidence under reproducibility, with no internal QA bug-list in the author review", "passed": true, "evidence": "Kept findings at reviewer altitude; framed asks to authors, no internal QA list."}], "summary": {"passed": 7, "failed": 0, "total": 7, "pass_rate": 1.0}}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "software-manuscript-review", "timestamp": "2026-07-09T00:00:00Z", "executor_model": "opus", "evals_run": [0, 1], "runs_per_configuration": 1}, "runs": [{"eval_id": 0, "eval_name": "review-framing-and-scope", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.833, "passed": 5, "failed": 1, "total": 6, "time_seconds": 251.0, "tokens": 50757, "errors": 0}, "expectations": [{"text": "Separates what goes to the authors, to the editor, and what is kept private", "passed": true, "evidence": "Section 3 explicitly splits To the authors / To the editor / Keep private."}, {"text": "Frames reuse/attribution/validation of established methods as the governing thesis for an integrated-platform paper (not a bug hunt)", "passed": true, "evidence": "Section 1 states reuse/attribution/validation + reproducibility is the governing thesis for an integrated platform, not a bug hunt."}, {"text": "Preserves confidentiality: warns against opening GitHub issues / contacting authors via the repo, and flags the journal AI-in-review policy", "passed": true, "evidence": "Section 6 warns 'Do NOT open GitHub issues', preserve anonymity, and check the journal AI-use policy (Section 0)."}, {"text": "Applies the 'reviewer is not the authors' QA' framing (bugs as evidence for the thesis, not a debugging service)", "passed": true, "evidence": "Section 1/2 state the install failure etc. are reproducibility evidence and 'not something you should resolve by debugging their scripts'."}, {"text": "Handles COI correctly: names the class of DEA tools and does not cite the reviewer's own package in the submittable text", "passed": false, "evidence": "Flagged the COI up front and named the class, BUT the drafted review_for_authors.txt lists 'prolfqua' inside the DEA class in the SUBMITTED text (prolfqua count=1) - the reviewer's own package should not be cited in the submitted review at all."}, {"text": "Recommends a concise, thesis-first, human-voiced review (~750 words) rather than a five-page audit", "passed": true, "evidence": "Recommends thesis-first, ~750-word review; its own drafted review is 759 words."}], "notes": []}, {"eval_id": 0, "eval_name": "review-framing-and-scope", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.333, "passed": 2, "failed": 4, "total": 6, "time_seconds": 203.0, "tokens": 34832, "errors": 0}, "expectations": [{"text": "Separates what goes to the authors, to the editor, and what is kept private", "passed": true, "evidence": "Sections 4/5/6 separate authors / editor / keep-private thoroughly."}, {"text": "Frames reuse/attribution/validation of established methods as the governing thesis for an integrated-platform paper (not a bug hunt)", "passed": false, "evidence": "Lists concerns with reproducibility as M1 and attribution as M3; does not frame reuse/attribution/validation as the governing thesis for an integrated platform."}, {"text": "Preserves confidentiality: warns against opening GitHub issues / contacting authors via the repo, and flags the journal AI-in-review policy", "passed": true, "evidence": "Section 6 says 'Do NOT open GitHub issues' and covers the AI-assistance policy."}, {"text": "Applies the 'reviewer is not the authors' QA' framing (bugs as evidence for the thesis, not a debugging service)", "passed": false, "evidence": "No 'reviewer is not the authors' QA' framing; treats findings as concerns to raise, not evidence-for-a-thesis."}, {"text": "Handles COI correctly: names the class of DEA tools and does not cite the reviewer's own package in the submittable text", "passed": false, "evidence": "Suggests benchmarking against 'limma, MSstats, DEqMS, proDA' and lists prolfqua among existing tools; no COI awareness."}, {"text": "Recommends a concise, thesis-first, human-voiced review (~750 words) rather than a five-page audit", "passed": false, "evidence": "Very long multi-section guidance doc; no conciseness/word-target guidance."}], "notes": []}, {"eval_id": 1, "eval_name": "draft-author-and-editor-deliverables", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.857, "passed": 6, "failed": 1, "total": 7, "time_seconds": 203.4, "tokens": 49900, "errors": 0}, "expectations": [{"text": "Produces exactly the two skill-named files: review_for_authors.txt and mail_editor.txt", "passed": true, "evidence": "Wrote review_for_authors.txt and mail_editor.txt (exact skill filenames)."}, {"text": "Author-facing review is concise (<=1000 words, ~750 target)", "passed": true, "evidence": "review_for_authors.txt is 755 words (on the ~750 target)."}, {"text": "COI honored: prolfqua/prolfquapp is not cited in the author-facing review", "passed": true, "evidence": "prolfqua/prolfquapp count = 0 in review_for_authors.txt; named the class limma/MSstats/msqrob2/DEqMS."}, {"text": "The confidential editor note states the recommendation (major revision) with a short rationale", "passed": true, "evidence": "mail_editor.txt states 'Major revision, with re-review' with rationale (229 words)."}, {"text": "The formal recommendation is kept OUT of the author-facing comments (confidentiality convention)", "passed": false, "evidence": "The author-facing 'Overall' states 'I recommend major revision' - the formal recommendation leaked into the author comments (skill's Output-Shape template invites this)."}, {"text": "Attribution concern names reference method tools/citations feature by feature (VSN, quantile, KNN, BPCA, ORA)", "passed": true, "evidence": "Names VSN (Huber/vsn), quantile (Bolstad/preprocessCore), KNN (Troyanskaya/impute), BPCA (Oba/pcaMethods), ORA (clusterProfiler) feature by feature."}, {"text": "Bugs/install-failures are folded as evidence under reproducibility, with no internal QA bug-list in the author review", "passed": true, "evidence": "Install failure/hard-coded paths stated once under the reproducibility concern; no file-by-file QA list."}], "notes": []}, {"eval_id": 1, "eval_name": "draft-author-and-editor-deliverables", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 7, "failed": 0, "total": 7, "time_seconds": 98.7, "tokens": 30617, "errors": 0}, "expectations": [{"text": "Produces exactly the two skill-named files: review_for_authors.txt and mail_editor.txt", "passed": true, "evidence": "Wrote review_for_authors.txt and mail_editor.txt (matched the skill filenames despite no skill)."}, {"text": "Author-facing review is concise (<=1000 words, ~750 target)", "passed": true, "evidence": "review_for_authors.txt is 846 words (>~750 target but under the 1000 cap)."}, {"text": "COI honored: prolfqua/prolfquapp is not cited in the author-facing review", "passed": true, "evidence": "prolfqua/prolfquapp count = 0 in review_for_authors.txt."}, {"text": "The confidential editor note states the recommendation (major revision) with a short rationale", "passed": true, "evidence": "mail_editor.txt states the major-revision recommendation with rationale (342 words)."}, {"text": "The formal recommendation is kept OUT of the author-facing comments (confidentiality convention)", "passed": true, "evidence": "Author file contains no formal recommendation (count=0); baseline explicitly withheld it 'per confidentiality convention'."}, {"text": "Attribution concern names reference method tools/citations feature by feature (VSN, quantile, KNN, BPCA, ORA)", "passed": true, "evidence": "Requests primary citations for VSN, KNN, BPCA, hypergeometric test, and the DEA model, feature by feature."}, {"text": "Bugs/install-failures are folded as evidence under reproducibility, with no internal QA bug-list in the author review", "passed": true, "evidence": "Kept findings at reviewer altitude; framed asks to authors, no internal QA list."}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 0.845, "stddev": 0.012, "min": 0.833, "max": 0.857}, "time_seconds": {"mean": 227.2, "stddev": 23.8, "min": 203.4, "max": 251.0}, "tokens": {"mean": 50328.5, "stddev": 428.5, "min": 49900, "max": 50757}}, "without_skill": {"pass_rate": {"mean": 0.666, "stddev": 0.334, "min": 0.333, "max": 1.0}, "time_seconds": {"mean": 150.85, "stddev": 52.15, "min": 98.7, "max": 203.0}, "tokens": {"mean": 32724.5, "stddev": 2107.5, "min": 30617, "max": 34832}}, "delta": {"pass_rate": "+0.179", "time_seconds": "+76.3", "tokens": "+17604"}}, "notes": ["Aggregate hides a split: on eval-0 (framing) the skill helps a lot (+0.50), on eval-1 (drafting) it slightly HURT (-0.14) - do not read the mean alone.", "Skill value is concentrated in JUDGMENT/framing (thesis-first attribution, not-the-QA, confidentiality, author/editor/private split), not in mechanical drafting, which a strong model already does well unaided.", "FINDING 1 (skill bug): the author-facing template's 'Overall' invites the formal recommendation into review_for_authors.txt; the with_skill drafting run leaked 'I recommend major revision' there, while the baseline correctly withheld it. Fix: keep the formal recommendation in mail_editor.txt only; make 'Overall' an assessment without the accept/reject verdict.", "FINDING 2 (skill bug): the COI rule ('name the class, don't single out your own package') let the framing run cite prolfqua as one of a class in the SUBMITTED text. Fix: state explicitly that the reviewer's own package must not be cited in the submitted review at all, even within a class list.", "eval-1 baseline scored 7/7 vs with_skill 6/7 - honest evidence the skill did not add value on the pure drafting task and needs the two fixes above.", "Single run per configuration: pass-rate stddev here is between-eval variance, not run-to-run flakiness. For a real verdict, run each config 3x."]}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>
