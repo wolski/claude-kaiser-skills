@@ -16,25 +16,60 @@ Follow these guidelines when writing or reviewing Python code, based on [Google'
 
 ## Core Philosophy
 
-Match the style of surrounding code. Consistency within a file or module matters more than strict adherence to these guidelines.
+Match the surrounding project where it has an explicit convention. Style guidance does not choose
+the architecture: establish ownership, dependency direction, public contracts, and the product being
+constructed before applying formatting or pattern advice.
+
+## Architecture Before Style
+
+For refactors, first map the production callers, the intended public boundary, and the data that each
+operation actually needs. Tests are evidence of behavior, but a function used only by tests is not
+automatically public API or automatically dead. Check package exports, documented entry points,
+external consumers in scope, and production imports before deleting or preserving it.
+
+Do not introduce a design-pattern name as a substitute for this audit. In particular, use a Builder
+only when construction of a named product is genuinely complex:
+
+- Identify the product class first.
+- Put the builder in the same module as the product it builds.
+- Bind the evidence and intermediate values needed to construct that product.
+- Expose `build() -> Product`; invalid, unavailable, or ambiguous construction raises a precise
+  exception.
+- Filtering that determines which product can be constructed belongs in the builder when it is part
+  of that construction contract.
+
+A lookup object, locator, result union, or collection of saved function combinations is not a
+Builder merely because it has a method. If construction is simple, prefer the constructor or one
+exactly named function. Do not create compatibility aliases unless the supported API contract
+requires them.
+
+Organize modules by ownership and one-way dependency direction. Shared value objects may sit below
+passive source models, which may sit below an effective product and its builder. A circular import is
+evidence that ownership or dependency direction needs examination; do not invent a `Protocol`, move
+the builder away from its product, or switch import syntax solely to hide the cycle.
 
 ## Language Rules
 
 ### Imports
 
-Use `import` statements for packages and modules in application code to avoid circular dependencies. For standard library and third-party packages, importing classes is acceptable.
+Follow the project's import convention and make dependencies explicit. Importing a module instead
+of a name does not prevent a circular dependency; cycles are determined by module initialization and
+dependency direction. Avoid cross-module imports of private names unless the project explicitly
+defines those modules as a package-internal API.
 
 **Yes:**
 ```python
-from pydantic import BaseModel  # Third-party: Class import OK
-from pathlib import Path        # Stdlib: Class import OK
-import sound_effects.utils      # App: Module import
-from myproject import config    # App: Module import
+from pathlib import Path
+
+from pydantic import BaseModel
+
+from myproject import config
+from myproject.rules.parse_rule import ParseRule
 ```
 
 **No:**
 ```python
-from myproject.utils import heavy_function  # App: Avoid direct function import if circular dep risk
+from myproject.rules._composition import _merge_fragments  # Cross-module private dependency
 ```
 
 #### Import Formatting
@@ -87,6 +122,9 @@ Annotate all function signatures. Type annotations improve readability and catch
 - Use built-in types (`list`, `dict`, `set`) instead of `typing.List`, etc. (Python 3.9+)
 - Import typing symbols directly: `from typing import Any, Union`
 - Use `None` instead of `type(None)` or `NoneType`
+- Give filesystem boundaries one exact type. Prefer `Path` inside typed application code and convert
+  external strings at the CLI, UI, JSON, or environment boundary. Do not spread `Path | str` through
+  internal APIs as a convenience.
 
 ```python
 def fetch_data(url: str, timeout: int = 30) -> dict[str, Any]:
@@ -108,7 +146,8 @@ def fetch_data(url: str, timeout: int = 30, retries: int = 3) -> dict:
     ...
 ```
 
-**2. Pydantic models** — for grouped parameters or config objects:
+**2. A validated model** — only when the values form a real reusable invariant or external data
+contract, not merely because a function has several parameters:
 ```python
 from pydantic import BaseModel
 
@@ -124,7 +163,7 @@ def process(items: list[str], config: ProcessConfig) -> int:
 process(items, ProcessConfig())
 ```
 
-Benefits of Pydantic models:
+When such a model is justified, benefits include:
 - Function signatures are honest (expects config, gets config)
 - Defaults live in one place (the model)
 - Caller intent is explicit (`Config()` means "I want defaults")
@@ -137,7 +176,7 @@ Benefits of Pydantic models:
 def foo(a: int, b: list[int] = []) -> None:
     b.append(a)
 
-# None pattern - AVOID!
+# None is valid only when absence is part of the contract.
 def foo(a: int, b: list[int] | None = None) -> None:
     if b is None:
         b = []
@@ -389,7 +428,10 @@ if __name__ == "__main__":
 
 ### Function Length
 
-Keep functions focused and reasonably sized. If a function exceeds about 40 lines, consider splitting it unless it remains very readable.
+Keep functions conceptually focused. Line count and cyclomatic complexity are diagnostic signals,
+not refactoring targets. Split only when the extracted operation has its own coherent contract and
+meaningful typed inputs/outputs; do not turn readable structural descent or a linear transformation
+into forwarding helpers to satisfy a number.
 
 ## Type Annotation Details
 
@@ -592,14 +634,17 @@ dict = 'something'  # noqa: A001
 
 ### Package `__init__.py` Files
 
-**THERE MUST BE NO CODE IN `__init__.py` FILES.** Keep them empty.
+Follow the package's established export policy. Empty `__init__.py` files are useful when callers
+must import owning modules directly; deliberate re-exports are also valid when the package defines a
+stable facade. Do not create re-export aliases merely to preserve an API that the contract audit has
+retired.
 
 ```python
 # __init__.py
-# This file should be empty
+# Empty when the project requires direct owning-module imports.
 ```
 
-Import from modules directly:
+When the project uses direct owning-module imports:
 ```python
 # Instead of: from mypackage import MyClass
 # Use: from mypackage.core import MyClass
@@ -607,7 +652,8 @@ Import from modules directly:
 
 ### Preferred Libraries
 
-Use these libraries when applicable:
+Prefer the libraries already selected by the project when they fit the required contract. Do not add
+a framework or dependency just because it appears in this table:
 
 | Purpose | Library |
 |---------|---------|
@@ -623,14 +669,16 @@ When writing Python code:
 1. Use type annotations for all functions
 2. Follow naming conventions consistently
 3. Write clear docstrings for all public APIs
-4. Keep functions focused and reasonably sized
+4. Keep functions conceptually focused; do not refactor to a metric
 5. Use comprehensions for simple cases
 6. Prefer implicit false in boolean contexts
 7. Use f-strings for formatting
 8. Always use context managers for resources
 9. Run `ruff check` and `ruff format`
-10. Keep `__init__.py` files empty
-11. **Stay consistent** with existing code
+10. Audit ownership, dependency direction, and public callers before restructuring
+11. Use a Builder only for complex construction of its colocated product
+12. Follow the project's `__init__.py` export policy
+13. **Stay consistent** with existing code
 
 ## Additional Resources
 
