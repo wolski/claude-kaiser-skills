@@ -51,6 +51,13 @@ absent case" grows those types by the dozen, and **nothing in that discipline ma
 method.** The modelling lands; the branch survives. On the package above: 18 such types, **0 with a
 method**, discriminated in 8 modules.
 
+> **⚠ That section's headline is the one number in this skill you must not optimise.** It counts
+> *types without methods*, so **adding a method always improves it — including a method nobody
+> calls**, which is `references/anti-patterns.md` §4 with a green dashboard. The honest fix is as
+> often deletion: see **gate 3** in *The remedy*. On a later pass of the same package the count fell
+> 14 → 5 by deleting nine types and adding none. Treat every one of these outputs as a gauge, never a
+> gate; a CI check on this number would reward exactly the wrong edit.
+
 ## The one question
 
 > Does this branch ask **what something is** (type, vendor, format, mode, strategy,
@@ -83,6 +90,16 @@ protection from this bound.
 **B2 — Does the union have ≥ 2 consumer sites?** One site is B5 territory. Two in one module is
 weak; **two modules is the threshold worth reporting.** Skipping this over-reports every small
 result type. The script prints site and module counts per union.
+
+> **B2 counts per union, so it can miss a module.** One package had six one-site absent types in a
+> single file — each scored `weak`, all six below threshold — while that file ranked **5th in the
+> package** for owned-target `isinstance`. Six non-findings summed to a real one and the bound could
+> not say so. **Before clearing a module, check whether several sub-threshold unions share one
+> consumer**; the script prints a `CLUSTERED WEAK TYPES` rollup for exactly this. The finding there
+> is rarely "add methods to six types" — it is usually one thing all six work around, as it was: the
+> six existed only
+> to decide whether a key reached the output JSON, which `model_dump(exclude_none=True)` already did
+> for a neighbouring field in the same function.
 
 **B3 — For a mode-string candidate, does anything at the far end branch on the value?** grep the
 literal. If nothing compares against it, the string is a **label**, not a discriminator — that is
@@ -132,6 +149,14 @@ Two tells the script surfaces but cannot judge:
   method. `"""Use the stored enzyme when present, otherwise Trypsin."""` on a class with no fields
   and no methods is the defect announcing itself in prose.
 
+**Shape 4 must clear gate 2 before you report it, and the script cannot check that.** A pydantic
+discriminated union is *supposed* to have no methods. If its only consumers are its own validator and
+its factory, it is finished code and the branch is exactly where remedy step 6 puts it. One package
+had `NoValuePattern | RegexValuePattern` scoring FINDING at 2 sites / 2 modules — one a schema
+validator, one `make_layer_coercion`, with the runtime polymorphism already built alongside as
+`LayerCoercion`. Acting on it would have converted a correct design into a layering violation. Check
+where the two sites *are* before writing a remedy.
+
 ## The remedy, in order
 
 **The first two steps are gates.** Both can disqualify the whole finding, and both are cheaper than
@@ -144,18 +169,41 @@ any edit. Asking them late means writing a full remedy before discovering it was
 2. **Gate — is the type a storage schema?** A pydantic model, a TOML/JSON shape, a table row? Then
    the behaviour does *not* go on it: the remedy is a runtime type plus a factory, and the schema's
    validators are **correct and stay**. Getting this wrong converts a clean finding into a layering
-   violation. See `references/anti-patterns.md` §3.
-3. **Split the type**, or give the absent case an identity member. One class per case, each
+   violation. See `references/anti-patterns.md` §3. And note what a runtime type *is*: a genuinely
+   different type carrying only what the computation needs. **A wrapper that holds the schema and
+   forwards to it is not one** — it is a carpet, and it grows the type count you came to reduce.
+3. **Gate — for an absent case: does it *do* anything?** This gate has two exits and only one of
+   them adds code.
+   - It does something → give it the method. `MissingSearchParameters.cleavage(default=…)` returns
+     the default **and logs the fallback**; `MissingRuleVersion.accepts()` returns `True` because
+     absent evidence excludes nothing; `MissingGeneName.cell()` yields `pd.NA`. Continue to step 5.
+   - **It does nothing → delete the type.** It is `| None` wearing a class. Every consumer only ever
+     asked it whether the value was there, which is *what happened*, and the one question at the top
+     of this skill already ruled that ordinary control flow.
+
+   The test is whether you can finish *"and then each type would implement …"*. When you cannot, the
+   answer is not a weaker method — it is that the type should not exist.
+
+   Where the `| None` may then live: a **storage boundary** — an adapter, a CLI, a parser — where
+   absence is a fact about the world. Not in a computation signature; that rule does not move. In one
+   package this deleted nine classes and removed nineteen `isinstance` sites, and it is the exit two
+   review drafts missed while proposing eleven new wrapper classes instead. **A package whose stated
+   defect is "18 types too many" is not repaired by a nineteenth.**
+
+   Beware the near-miss: wrapping the present arm so you can narrow on *that* instead
+   (`isinstance(payload, StoredNamespaceText)`) relocates the branch and satisfies step 7's letter
+   while failing its intent entirely.
+4. **Split the type**, or give the absent case an identity member. One class per case, each
    declaring only its own fields. Constraints the validator policed from outside become field
    declarations: `Field(min_length=1)`, a required `str` instead of `str | None`, a `Literal` for a
    forced name.
-4. **Put the method on each class, and return the result — not a token naming it.**
-5. **Write the factory.** A union with nothing to construct it is not finished. It is also where an
+5. **Put the method on each class, and return the result — not a token naming it.**
+6. **Write the factory.** A union with nothing to construct it is not finished. It is also where an
    unimplemented variant fails: a mode declared in the schema with no runtime class is a missing
    registry entry, raising once at construction time instead of partway through the work.
-6. **Delete the branches.** If any survive, the polymorphism moved rather than happened.
+7. **Delete the branches.** If any survive, the polymorphism moved rather than happened.
 
-**Do not stop at step 3.** Splitting a type without moving behaviour onto it produces shape 4 —
+**Do not stop at step 4.** Splitting a type without moving behaviour onto it produces shape 4 —
 measurably the most common defect this skill finds.
 
 **Write the remedy only for findings you are actually reporting, and size it to the finding.** A

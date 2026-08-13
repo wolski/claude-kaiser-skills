@@ -404,7 +404,21 @@ def render(r: dict) -> str:
             add(f"           docstring: {h['docstring'][:88]}")
     add(f"  ({len(r['identity_types_with_methods'])} identity types DO carry methods — those are fine)")
     add("  >=2 consumer sites is the reporting threshold; 1 site is 'two arms that will not grow'.")
-    add("  A docstring describing behaviour on a class with no methods IS the finding, in prose.\n")
+    add("  A docstring describing behaviour on a class with no methods IS the finding, in prose.")
+    # B2 counts per union, so several sub-threshold types sharing one module each score 'weak'
+    # while the module they share is the real finding. Roll them up: the answer is usually the one
+    # thing all of them work around, not a method on each.
+    clustered = {
+        path: n
+        for path, n in Counter(h["file"] for h in bare if h["consumer_sites"] < 2).items()
+        if n >= 2
+    }
+    if clustered:
+        add("  CLUSTERED WEAK TYPES — below threshold alone, one module together:")
+        for path, n in sorted(clustered.items(), key=lambda kv: -kv[1]):
+            add(f"    {n} weak identity types in {path}")
+        add("    Find the single thing they all work around before adding a method to any of them.")
+    add("")
 
     add(f"VALIDATOR MESSAGES (shape 1) — {len(r['validator_messages'])}")
     for h in r["validator_messages"]:
