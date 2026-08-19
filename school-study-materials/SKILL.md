@@ -1,3 +1,10 @@
+---
+name: school-study-materials
+description: >-
+  Generate German-language course summaries, learning objectives, cheat sheets,
+  and practice questions from school scripts and extracted Markdown.
+---
+
 # School Study Materials Generator
 
 Generate Kurzusammenfassungen (summaries), Lernziele (learning objectives), and Kontrollfragen (control questions) from school scripts.

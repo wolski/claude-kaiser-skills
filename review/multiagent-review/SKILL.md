@@ -1,6 +1,14 @@
 ---
 name: multiagent-review
-description: Run a panel-style multi-agent code review. Dispatches three specialist agents in parallel — a Gang of Four design-patterns expert, a classic-antipatterns expert, and a function-complexity / mixed-abstraction expert — then a lead architect synthesizes their findings into a balanced, prioritized report. Supports four scopes: branch diff (default), a specific path, the whole codebase, or a commit range. Use this skill whenever the user asks for "multi-agent code review", "panel review", "deep code review with specialists", "GoF review", "antipattern audit", "review the whole codebase", "review the entire code", "full code review", "review this with multiple reviewers", or invokes /multiagent-review. Prefer this over a single-pass review whenever the user wants thorough, multi-perspective feedback on a diff, branch, PR, file, module, or full repository.
+description: >-
+  Runs a panel-style multi-agent code review. Dispatches specialists for GoF
+  patterns, antipatterns and declarative boundaries, function complexity,
+  mixed abstraction and public API contracts, and architecture boundaries the
+  repository declares about itself; then synthesizes a balanced, prioritized
+  report. Supports branch diffs, specific paths, whole codebases, and commit
+  ranges. Use when the user asks for a multi-agent, panel, deep, GoF,
+  antipattern, API-design, architecture-boundary, layering, whole-codebase,
+  full, or multi-perspective code review, or invokes /multiagent-review.
 ---
 
 # Multi-Agent Code Review

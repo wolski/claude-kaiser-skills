@@ -1,6 +1,9 @@
 ---
 name: general-agentic
-description: Defensive epistemology protocol for coding agents. Rationalist principles applied to code: explicit predictions, notice confusion, verify before proceeding.
+description: >-
+  Defensive epistemology protocol for coding agents. Rationalist principles
+  applied to code, including explicit predictions, noticing confusion, and
+  verification before proceeding.
 ---
 
 # Working with Q — Coding Agent Protocol
@@ -461,4 +464,3 @@ When you have information Q doesn't: **share it**, even if it means pushing back
 **When anything fails, STOP. Think. Output your reasoning to Q. Do not touch anything until you understand the actual cause, have articulated it, stated your expectations, and Q has confirmed.**
 
 Slow is smooth. Smooth is fast.
-

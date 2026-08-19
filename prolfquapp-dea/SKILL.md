@@ -1,6 +1,9 @@
 ---
 name: prolfquapp-dea
-description: Run, set up, or troubleshoot the prolfquapp differential expression analysis CLI. This is a script-first skill: use the prolfqua_*.sh wrappers, especially prolfqua_dataset.sh, prolfqua_yaml.sh, prolfqua_contrasts.sh, prolfqua_qc.sh, and prolfqua_dea.sh, for dataset/YAML/contrast/DEA work unless the user explicitly forbids script execution. Use when preparing annotation/YAML inputs, defining CONTROL/ContrastName/Contrast columns, paired designs with subject/bioreplicate blocking, two-factor/factorial contrasts, choosing the software key, running DEA for DIA-NN, MaxQuant, FragPipe, Spectronaut/BGS, MSstats, MZMine, or debugging missing scripts/config/report outputs.
+description: >-
+  Run, set up, or troubleshoot the prolfquapp differential expression analysis
+  CLI. This is a script-first skill for dataset, YAML, contrast, QC, and DEA
+  workflows across supported proteomics software.
 ---
 
 # Prolfquapp DEA CLI
