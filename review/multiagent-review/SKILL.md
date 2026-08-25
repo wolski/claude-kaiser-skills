@@ -13,7 +13,7 @@ description: >-
 
 # Multi-Agent Code Review
 
-A panel of four specialists reviews changed code. The first three run in parallel and produce findings; the lead architect then synthesizes a balanced report.
+A panel of five specialists reviews changed code. The first four run in parallel and produce findings; the lead architect then synthesizes a balanced report.
 
 ## Scope selection
 
@@ -39,18 +39,64 @@ Whole-codebase reviews can blow past the specialists' useful context. Before dis
 
 ## Orchestration
 
-Run the three specialists **in parallel** by issuing three `Agent` tool calls in a single message (subagent_type `general-purpose`). Wait for all three to return, then issue a fourth call to the lead architect.
+Run the four specialists **in parallel** by issuing four `Agent` tool calls in a single message (subagent_type `general-purpose`). Wait for all four to return, then issue a fifth call to the lead architect.
 
 For each specialist call:
 - Pass the scope (file list + diff) inline in the prompt.
 - Embed the specialist's instructions by reading the corresponding file under `agents/` and pasting it into the prompt. Tell the agent to return findings as a JSON array (schema below) wrapped in a single ```json fenced block, plus a short prose summary.
 - Be explicit that the agent should not modify files — read-only review.
 
-For the lead architect call, pass the three specialists' raw outputs verbatim and the instructions from `agents/lead-architect.md`.
+Build a **context pack** in addition to the requested files or diff. Include only the directly
+relevant supporting material:
+
+- Direct callers of changed public functions and the types, protocols, overloads, or exports that
+  define their contract.
+- Repository-owned rules, configuration, or schemas that describe decisions also present in the
+  changed control flow.
+- Existing neighboring implementations when they establish the intended API or configuration
+  boundary.
+- The architectural rules the repository declares about itself — the nearest and root
+  `AGENTS.md`/`CLAUDE.md`, `docs/ARCHITECTURE.md`, and any implemented plan document describing the
+  boundary the code is supposed to have.
+- The architectural guards that enforce those rules — AST/boundary tests, import-linter contracts,
+  custom lint rules, and ratchet allowlists — **including their current content**, not only whether
+  the diff touched them. The architecture-boundaries specialist cannot detect a widened allowlist
+  without seeing it.
+
+Do not expand this into an unbounded repository survey. The purpose is to expose design boundaries
+that a changed-file-only review cannot see.
+
+### Mandatory coverage gates
+
+Require these exact declarations after the relevant specialist's JSON:
+
+- Antipattern specialist:
+  `Declarative-boundary audit: PASS | FINDING | N/A — <evidence or reason>`
+- Function-complexity specialist:
+  `Public-API audit: PASS | FINDING | N/A — <symbols reviewed or reason>`
+- Function-complexity specialist:
+  `Exception-control-flow audit: PASS | FINDING | N/A — <boundaries reviewed or reason>`
+- Architecture-boundaries specialist:
+  `Declared-rule audit: PASS | FINDING | N/A — <rules and guards checked, or reason>`
+- Architecture-boundaries specialist:
+  `Guard-integrity audit: PASS | FINDING | N/A — <guards inspected, or reason>`
+
+`PASS` means the lens was checked and no issue was found. `FINDING` must cite one or more finding
+IDs. `N/A` requires a reason, such as no public callable, exception boundary, repository-owned
+declarative boundary, declared architectural rule, or architectural guard in scope. If a declaration
+is absent or unsupported, follow up with that specialist before synthesis. An empty findings array is
+valid, but silence is not evidence that a mandatory lens was applied.
+
+`Guard-integrity audit` is the one gate that must not be waved through on a green suite. A change
+that weakens an architectural guard — widening an allowlist, relaxing an exact-set assertion,
+deleting a boundary test — passes CI by construction. If this declaration is missing, do not
+synthesize without it.
+
+For the lead architect call, pass the four specialists' raw outputs verbatim and the instructions from `agents/lead-architect.md`.
 
 ### Why parallel
 
-The three specialists are independent — they apply different lenses to the same code. Sequential dispatch would just multiply latency. The lead architect must run last because synthesis requires all three inputs.
+The four specialists are independent — they apply different lenses to the same code. Sequential dispatch would just multiply latency. The lead architect must run last because synthesis requires all four inputs.
 
 ## Finding schema
 
@@ -68,7 +114,7 @@ Every specialist returns findings in this shape so the lead architect can merge 
 }
 ```
 
-ID prefixes: `GOF-` for gof-patterns, `ANTI-` for antipattern-specialist, `FUNC-` for function-complexity. Keep prefixes stable so the lead architect can attribute findings.
+ID prefixes: `GOF-` for gof-patterns, `ANTI-` for antipattern-specialist, `FUNC-` for function-complexity, `BOUND-` for architecture-boundaries. Keep prefixes stable so the lead architect can attribute findings.
 
 Severity guidance:
 - **critical** — bug risk, security issue, or structural problem that will compound.
@@ -82,9 +128,17 @@ Read the matching file when dispatching each agent.
 | Agent | Instruction file | ID prefix |
 |---|---|---|
 | GoF design patterns | `agents/gof-patterns.md` | `GOF-` |
-| Classic antipatterns | `agents/antipattern.md` | `ANTI-` |
-| Function complexity & mixed abstraction | `agents/function-complexity.md` | `FUNC-` |
+| Antipatterns & declarative boundaries | `agents/antipattern.md` | `ANTI-` |
+| Function complexity, mixed abstraction & public API contracts | `agents/function-complexity.md` | `FUNC-` |
+| Architecture boundaries & declared-rule enforcement | `agents/architecture-boundaries.md` | `BOUND-` |
 | Lead architect (synthesis) | `agents/lead-architect.md` | — |
+
+The architecture-boundaries specialist is the only one whose criteria come from the repository rather
+than from general design judgment: it enforces rules the repository declares in `AGENTS.md`,
+`CLAUDE.md`, or architecture documents, and checks that the change did not weaken the tests and
+allowlists enforcing them. In a repository that declares no architectural rules and has no
+architectural tests, it correctly returns `N/A` — dispatch it anyway rather than deciding in advance
+that there is nothing to check.
 
 ## Output
 

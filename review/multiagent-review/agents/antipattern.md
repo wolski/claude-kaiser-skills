@@ -17,6 +17,29 @@ Use this list as a checklist, but read the code first and let what you see drive
 - **Copy-Paste Programming** — duplicated blocks where the duplication encodes a real shared concept that should be extracted.
 - **Boat Anchor** — code or dependencies kept around with no current use, "in case we need it".
 - **Dead Code** — unreachable branches, unused functions/parameters, exports nobody imports.
+- **Configuration in Code / Weak Declarative Boundary** — ordered fallbacks, guessed field names,
+  vendor-specific branches, or repeated optionality checks encode domain facts that a
+  repository-owned rule, schema, or configuration model should state once.
+
+## Mandatory declarative-boundary audit
+
+Inspect relevant rules, configuration, and schemas alongside the changed code. Ask:
+
+- Would adding a vendor, alias, field role, capability, or precedence rule require changing
+  resolver control flow instead of changing declarative data?
+- Does downstream code repeatedly defend against `None` because a repository-owned schema leaves
+  an invariant optional that should be required or represented as an explicit capability?
+- Does a resolver try a stored role and then guess hard-coded candidate names, duplicating or
+  weakening the declared source of truth?
+- Are the same domain mappings or precedence rules scattered across code and configuration?
+
+Flag the issue when the repository controls the schema and can express the facts there. Recommend
+strengthening and validating the schema at its loading boundary, followed by one generic consumer.
+Keep algorithms, genuine runtime decisions, and error handling in code; declarative data should
+describe names, mappings, capabilities, and precedence, not become a programming language.
+
+Do not flag ordinary guard clauses, validation of untrusted external input, or branches whose
+behavior genuinely differs at runtime. An `if` chain is evidence to inspect, not a defect by shape.
 
 ## How to judge
 
@@ -28,12 +51,21 @@ Watch for false positives:
 - Three similar lines is not Copy-Paste Programming. The duplication has to encode a real shared concept.
 - A constant with an obvious name (`HTTP_OK = 200`) is not a Magic Number.
 - A long function isn't automatically a God Object — judge by *cohesion of responsibility*, not line count (the function-complexity specialist owns size concerns).
+- A few early returns that enforce one clear contract are not Configuration in Code. Require
+  evidence of a repository-owned or appropriate declarative boundary.
 
 ## Output
 
 Return a JSON array using the shared schema (id prefix `ANTI-`). Wrap in ```json. Add a short summary (≤5 sentences) noting the dominant antipatterns in the change, if any.
 
 In `suggestion`, name the antipattern and the decay mechanism. In `fix_prompt`, give a concrete remediation step.
+
+After the JSON and summary, emit exactly one coverage declaration:
+
+`Declarative-boundary audit: PASS | FINDING | N/A — <evidence or reason>`
+
+For `FINDING`, include the applicable `ANTI-*` IDs. `PASS` and `N/A` must still name what was
+checked or why the audit did not apply.
 
 `[]` is a valid result. Do not invent findings.
 

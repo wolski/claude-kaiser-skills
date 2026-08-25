@@ -21,6 +21,83 @@ The smell is not "this function is long" — it's "this function changes registe
 - **Cyclomatic complexity.** Many independent branches (`if`, `case`, loops, exception paths) compound. Past ~10 the function is hard to test exhaustively. Recommend extracting branches into named predicates or strategy objects.
 - **Function size.** Use as a *signal*, not a rule. Long functions are worth a closer look but the real question is always cohesion and abstraction level.
 - **Parameter explosion.** More than ~4 parameters often means the function is gathering inputs for several sub-operations that should be separate.
+- **Exception-driven program logic.** Broad catches that return a sentinel, mutate ordinary state,
+  or silently choose a fallback turn defects into expected branches. They erase the distinction
+  between invalid external input and a programming error.
+
+## Mandatory exception-control-flow audit
+
+Inspect every changed `try`/`except` and every caller that depends on an exception being converted
+into ordinary state. Flag:
+
+- `except Exception` or `except BaseException` used to continue normal execution.
+- “Best effort” blocks that swallow import, metadata, parser, schema, or computation failures.
+- Catch blocks that write values such as `parse_error`, return `None`, or select another strategy
+  after an unbounded failure.
+- Nested fallbacks where each failed mechanism is silently ignored.
+- `# noqa: BLE001` comments that justify an intentionally broad exception boundary.
+
+Negative example:
+
+```python
+try:
+    params = parse_params(params_path, software=software)
+except Exception as exc:  # noqa: BLE001
+    metadata["search_parameters_error"] = f"{type(exc).__name__}: {exc}"
+    return
+```
+
+This is not graceful degradation. It makes parser defects, type errors, and broken invariants look
+like an expected “no parameters” outcome. Let the failure propagate. If a true process, protocol,
+or untrusted-input boundary has a documented recovery contract, catch only the narrow domain
+exception that represents that expected failure and keep the recovery at that boundary.
+
+Also reject broad “optional lookup” fallbacks such as:
+
+```python
+try:
+    from importlib.metadata import version
+    return version("package")
+except Exception:
+    pass
+```
+
+Import supported dependencies normally. When an API represents one expected absence with a
+specific exception such as `PackageNotFoundError`, catch only that exception; unrelated failures
+must remain visible.
+
+## Mandatory public API contract audit
+
+Inspect every changed public callable and the callers and type definitions that establish its
+contract. Check for:
+
+- `Any`, unbounded mappings, or broad unions where a concrete domain type or focused `Protocol`
+  exists.
+- Many independent `| None` parameters, booleans, strings, or mode flags that create implicit
+  execution modes or invalid combinations.
+- A configuration object plus individual override parameters for the same settings, creating two
+  sources of truth and hidden precedence rules.
+- One public function accepting several container families while also selecting modalities,
+  loading data, computing, and optionally storing or mutating results.
+- Complexity suppressions such as `# noqa: PLR0913`. Treat a suppression as a request to inspect
+  the design, not as justification for it.
+
+Recommend a concrete contract, not merely "reduce the parameter count":
+
+- Use the actual domain type or a narrow behavior-based `Protocol`.
+- When container behaviors differ materially, expose typed entry points or adapters backed by one
+  typed private core.
+- Group settings that form one concept into a cohesive typed request/configuration object.
+- Resolve defaults and overrides once before calling the core so the core receives one valid,
+  explicit state.
+
+Prefer the smallest design that removes the ambiguity. Do not invent a `Protocol`, adapter layer,
+configuration object, or family of functions unless actual callers and behavior variation justify
+it. A concrete union with one uniform operation may be the complete solution.
+
+Do not flag the keyword-only `*`, a single meaningful optional parameter, a concrete union with one
+uniform behavior, or a long but cohesive signature by syntax alone. Explain the erased contract,
+invalid combinations, mixed responsibilities, or duplicated source of truth.
 
 ## How to recommend the split
 
@@ -42,7 +119,25 @@ Be especially alert for the file-IO-mixed-with-math pattern the user explicitly 
 
 Return a JSON array using the shared schema (id prefix `FUNC-`). Wrap in ```json. Add a short summary (≤5 sentences) of the abstraction-level health of the change.
 
-In `suggestion`, name the proposed extracted functions and the principle violated (SLAP, SRP, cyclomatic complexity, parameter count). In `fix_prompt`, write an instruction concrete enough to execute — including the new function names, their signatures, and which lines move where.
+In `suggestion`, name the violated principle and a concrete correction. For a split finding, name
+the proposed extracted functions and the lines that move. For a public API finding, specify the
+smallest justified typed contract, entry points, or configuration model based on actual callers.
+Make `fix_prompt` concrete enough to execute without inventing abstractions unsupported by the
+reviewed code.
+
+After the JSON and summary, emit exactly one coverage declaration:
+
+`Public-API audit: PASS | FINDING | N/A — <symbols reviewed or reason>`
+
+For `FINDING`, include the applicable `FUNC-*` IDs. `PASS` and `N/A` must still identify the
+reviewed public symbols or explain why no public API was in scope.
+
+Then emit exactly one exception declaration:
+
+`Exception-control-flow audit: PASS | FINDING | N/A — <boundaries reviewed or reason>`
+
+For `FINDING`, include the applicable `FUNC-*` IDs. `PASS` and `N/A` must name the reviewed
+exception boundaries or explain why none were in scope.
 
 `[]` is a valid result. Do not invent findings.
 

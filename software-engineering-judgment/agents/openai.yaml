@@ -1,0 +1,4 @@
+interface:
+  display_name: "Software Engineering Judgment"
+  short_description: "Cross-language design and refactoring principles"
+  default_prompt: "Review this code or design for cohesive ownership, minimal abstractions, explicit APIs, and maintainable module boundaries."

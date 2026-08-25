@@ -58,6 +58,7 @@ end
 | `plotly-compact` | Condensed Plotly rules | No |
 | `pixi` | Pixi package manager | No |
 | `general-agentic` | Defensive coding philosophy for agents | No |
+| `software-engineering-judgment` | Cross-language architecture, API, and refactoring judgment | Yes (2026-07-20) |
 | `phosphoproteomics-ptm-analysis` | Phosphoproteomics workflows | No |
 | `prolfqua-adding-models` | Adding models to prolfqua | No |
 | `prolfquapp-dea` | Running prolfquapp DEA CLI workflows | No |
